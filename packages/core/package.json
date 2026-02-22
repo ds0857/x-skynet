@@ -1,19 +1,14 @@
 {
   "name": "@xskynet/core",
   "version": "0.1.0",
-  "license": "Apache-2.0",
-  "type": "module",
+  "description": "X-Skynet runtime engine",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "echo 'core build placeholder'",
-    "lint": "echo 'no lint yet'",
-    "typecheck": "echo 'no types yet'"
-  },
-  "dependencies": {
-    "@xskynet/contracts": "workspace:*"
+    "build": "tsc -p tsconfig.json",
+    "test": "node --experimental-vm-modules node_modules/.bin/jest"
   },
   "peerDependencies": {
-    "typescript": ">=5.3.0"
+    "@xskynet/contracts": "workspace:*"
   }
 }
