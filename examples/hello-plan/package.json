@@ -1,0 +1,25 @@
+{
+  "name": "@xskynet/hello-plan",
+  "version": "0.1.0",
+  "description": "Hello World example for X-Skynet agent framework",
+  "main": "index.ts",
+  "scripts": {
+    "start": "ts-node index.ts",
+    "build": "tsc"
+  },
+  "keywords": [
+    "xskynet",
+    "ai-agent",
+    "example"
+  ],
+  "author": "X-Skynet Team",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@xskynet/core": "^0.1.0",
+    "@xskynet/plugin-http": "^0.1.0"
+  }
+}
