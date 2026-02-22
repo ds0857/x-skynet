@@ -1,0 +1,21 @@
+{
+  "name": "@xskynet/example-hello-world",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Hello World example for X-Skynet",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "dev": "ts-node src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@xskynet/core": "^0.1.0",
+    "@xskynet/sdk-js": "^0.1.0"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}

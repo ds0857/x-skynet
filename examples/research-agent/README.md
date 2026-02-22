@@ -1,25 +1,29 @@
 # Research Agent Example
 
-This example demonstrates a research‑oriented agent that:
-- Decomposes a goal into parallelizable tasks
-- Uses StepExecutors provided by plugins (e.g., web fetch, LLM calls)
-- Aggregates artifacts and emits DomainEvents for observability
+This example simulates a multi-step research workflow similar to real X-Skynet use cases.
 
-## Scenario
+## Flow
+- Define a 3-step research plan (topics + URLs)
+- For each step, fetch content via an HTTP tool
+- Aggregate short snippets into a final summary
 
-Given a topic, the agent will:
-1. Generate a research plan
-2. Fetch and summarize key sources
-3. Consolidate findings into a brief
+## Run
 
-## How to run (conceptual)
+1) Install deps at repo root
 
-- Install workspace deps with pnpm
-- Enable plugins by adding them to your app loader
-- Create a Plan with Tasks and Steps that map to available StepExecutor kinds
+   pnpm install
 
-## Key ideas
+2) Build
 
-- Plugin‑first: all concrete capabilities come from plugins implementing contracts in `@xskynet/contracts`
-- Composability: Steps are atomic, enabling parallel fan‑out and deterministic fan‑in
-- Observability: Transports emit DomainEvents for tracing and metrics
+   pnpm --filter @xskynet/example-research-agent build
+
+3) Run
+
+   pnpm --filter @xskynet/example-research-agent start
+
+## Output
+
+Research Summary:
+- Project X-Skynet overview: <snippet>
+- Agent frameworks comparison: <snippet>
+- Plugin architecture patterns: <snippet>
