@@ -18,9 +18,11 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "peerDependencies": {
-    "typescript": ">=5.3.0"
+    "typescript": ">=5.3.0",
+    "@xskynet/core": "workspace:*"
   },
   "dependencies": {
-    "@xskynet/contracts": "workspace:*"
+    "@xskynet/contracts": "workspace:*",
+    "@anthropic-ai/sdk": "^0.32.0"
   }
 }
