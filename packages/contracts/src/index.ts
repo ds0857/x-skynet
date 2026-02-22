@@ -231,3 +231,53 @@ export const ok = <T>(value: T): Result<T> => ({ ok: true, value })
 export const err = <E = Error>(error: E): Result<never, E> => ({ ok: false, error })
 
 // End of RFC-0002 contracts
+
+// Community plugin interfaces (plugin-first architecture)
+// Minimal domain definitions referenced by plugin contracts
+export interface StepResult {
+  status: Exclude<StepStatus, 'running' | 'idle'>
+  output?: Artifact | null
+  outputs?: Artifact[]
+  error?: {
+    message: string
+    code?: string
+    details?: unknown
+  } | null
+  stats?: Step['stats']
+  metadata?: Record<string, unknown>
+}
+
+export interface DomainEvent {
+  id: ID
+  type: string
+  occurredAt: ISODateTime
+  aggregateId?: ID
+  payload?: Record<string, unknown>
+  metadata?: Record<string, unknown>
+}
+
+// 插件接口（社区扩展点）
+export interface StepExecutor {
+  readonly kind: string
+  execute(step: Step, ctx: RunContext): Promise<StepResult>
+}
+
+export interface MemoryProvider {
+  read(key: string): Promise<unknown>
+  write(key: string, value: unknown): Promise<void>
+  delete?(key: string): Promise<void>
+}
+
+export interface Transport {
+  emit(event: DomainEvent): Promise<void>
+  subscribe(handler: (event: DomainEvent) => void): () => void
+}
+
+export interface XSkynetPlugin {
+  name: string
+  version: string
+  executors?: StepExecutor[]
+  memoryProviders?: MemoryProvider[]
+  transports?: Transport[]
+}
+
