@@ -1,0 +1,35 @@
+codecov:
+  require_ci_to_pass: no
+
+coverage:
+  precision: 2
+  round: down
+  range: 70..100
+  status:
+    project:
+      default:
+        # Keep overall coverage from dropping more than 2%
+        target: auto
+        threshold: 2%
+        if_not_found: success
+    patch:
+      default:
+        # Encourage good coverage on new/changed code
+        target: 80%
+        threshold: 1%
+
+# These are mostly excluded from Jest coverage collection already, but we also
+# ignore them here so Codecov matches local coverage and avoids noise
+ignore:
+  - "packages/**/src/**/*.d.ts"
+  - "packages/**/src/__tests__/**"
+  - "packages/dag-viewer/**"
+  - "packages/logger/**"
+  - "packages/plugin-claude/**"
+  - "packages/plugin-http/**"
+  - "packages/plugin-telegram/**"
+  - "packages/sdk-js/**"
+  - "packages/cli/**"
+
+# Reduce noise on PRs — rely on checks UI instead
+comment: false
