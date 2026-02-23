@@ -53,11 +53,12 @@ packages/
 ├── contracts      — Shared TypeScript interfaces and OpenAPI schema
 ├── cli            — xskynet CLI (init / run / dev / logs / status)
 ├── logger         — Structured logging (pino + OpenTelemetry placeholder)
-├── plugin-claude  — Claude / DashScope LLM executor
-├── plugin-http    — Generic HTTP call executor
-├── plugin-shell   — Shell command executor
-├── sdk-js         — JavaScript/TypeScript client SDK
-└── sdk-py         — Python client SDK (pip install xskynet)
+├── plugin-claude    — Claude / DashScope LLM executor
+├── plugin-http      — Generic HTTP call executor
+├── plugin-shell     — Shell command executor
+├── plugin-telegram  — Telegram channel transport + executor (Bot API)
+├── sdk-js           — JavaScript/TypeScript client SDK
+└── sdk-py           — Python client SDK (pip install xskynet)
 ```
 
 ---

@@ -9,6 +9,7 @@
     "test": "node --experimental-vm-modules node_modules/.bin/jest"
   },
   "peerDependencies": {
-    "@xskynet/contracts": "workspace:*"
+    "@xskynet/contracts": "workspace:*",
+    "@xskynet/plugin-telegram": "workspace:*"
   }
 }

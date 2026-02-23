@@ -1,0 +1,23 @@
+{
+  "name": "@xskynet/plugin-telegram",
+  "version": "0.1.0",
+  "description": "Telegram channel plugin for X-Skynet — receive and send messages via Telegram Bot API",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "node-telegram-bot-api": "^0.66.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0",
+    "@types/node-telegram-bot-api": "^0.64.0"
+  },
+  "peerDependencies": {
+    "@xskynet/contracts": "workspace:*",
+    "typescript": ">=5.3.0"
+  }
+}
