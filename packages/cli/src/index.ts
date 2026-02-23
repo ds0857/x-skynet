@@ -6,13 +6,15 @@ import { registerRunCommand } from './commands/run.js';
 import { registerDevCommand } from './commands/dev.js';
 import { registerLogsCommand } from './commands/logs.js';
 import { registerAgentsCommand } from './commands/agents.js';
+import { registerStatusCommand } from './commands/status.js';
+import pkg from "../package.json" assert { type: "json" };
 
 const program = new Command();
 
 program
   .name('xskynet')
   .description('X-Skynet CLI — build, run, and manage local agents')
-  .version('0.1.0')
+  .version(pkg.version)
   .option('-c, --config <path>', 'path to config file')
   .option('--verbose', 'enable verbose logging', false)
   .option('--json', 'output JSON lines (machine-readable)', false)
@@ -38,12 +40,13 @@ registerRunCommand(program);
 registerDevCommand(program);
 registerLogsCommand(program);
 registerAgentsCommand(program);
+registerStatusCommand(program);
 
 program
   .command('version')
   .description('Print version information')
   .action(() => {
-    const version = '0.1.0';
+    const version = pkg.version;
     const info = { version, node: process.version, platform: `${process.platform}-${process.arch}` };
     if (process.env.XSKYNET_JSON) {
       process.stdout.write(JSON.stringify(info) + '\n');
