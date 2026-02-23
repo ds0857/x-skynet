@@ -1,121 +1,78 @@
 # @x-skynet/dag-viewer
 
-> **P2-07** — DAG Run Viewer · React + [Mermaid.js](https://mermaid.js.org/)
+**P2-07** — Lightweight DAG Run Viewer for X-Skynet mission graphs.
 
-Visualise X-Skynet mission execution graphs directly in the browser.
-Each mission step becomes a node; dependency edges connect them into a directed acyclic graph (DAG).
-Node shapes and colours reflect real-time execution status.
+Visualises task execution DAGs with real-time status colours using **React + Vite + Mermaid.js**.
 
----
+## Features
 
-## Screenshot
+- 🔷 Directed acyclic graph rendered via Mermaid.js
+- 🟢 Node colours encode status: **queued** (grey) · **running** (blue) · **succeeded** (green) · **failed** (red)
+- 📋 Sidebar run list — click to switch between DAG runs
+- 📊 Node detail table below the diagram
+- ⚡ Vite dev server with HMR
+
+## Structure
 
 ```
-╔══════════════════════════════╗
-║  ✦ X-Skynet  DAG Run Viewer  ║
-╠══════════╦═══════════════════╣
-║ Missions ║ DAG: Market Research Report
-║ ─────────║ ┌──────────────────┐
-║ Market   ║ │ step-1 (scout) ✓ │
-║ Parallel ║ └────────┬─────────┘
-║ Campaign ║          ▼
-╚══════════║  ( step-2: quill ⟳ )
-           ║          ▼
-           ║  [ step-3: observer ▭ ]
-           ╚══════════════════════════
+src/
+├── App.tsx                    # Root layout (header + sidebar + main panel)
+├── main.tsx                   # React DOM entry point
+├── components/
+│   ├── DagGraph.tsx           # Core: Mermaid.js DAG renderer
+│   ├── RunList.tsx            # Sidebar: clickable run list
+│   └── StatusBadge.tsx        # Pill badge: queued / running / succeeded / failed
+├── types/
+│   └── dag.ts                 # DAGRun, DAGNode, Edge type definitions
+└── utils/
+    └── layout.ts              # Topological sort + depth/rank layout helpers
 ```
 
----
+## Data Types
 
-## Node shapes by status
+```typescript
+interface DAGRun {
+  id: string
+  name: string
+  status: 'queued' | 'running' | 'succeeded' | 'failed'
+  nodes: DAGNode[]
+  edges: Edge[]
+  startedAt?: string
+  completedAt?: string
+}
 
-| Status    | Mermaid shape   | Meaning                     |
-|-----------|-----------------|-----------------------------|
-| queued    | `[ ]` rectangle | Waiting for dependencies    |
-| running   | `([ ])` stadium | Currently executing         |
-| succeeded | `( )` rounded   | Completed successfully      |
-| failed    | `{{ }}` hexagon | Terminated with error       |
-| skipped   | `[/ /]` trap.   | Bypassed (upstream failure) |
+interface DAGNode {
+  id: string
+  label: string
+  status: 'queued' | 'running' | 'succeeded' | 'failed'
+  type: 'task' | 'agent' | 'trigger'
+}
 
----
-
-## Quick start
-
-```bash
-cd packages/dag-viewer
-npm install
-npm run dev          # http://localhost:5173
-npm run build        # → dist/
-```
-
----
-
-## Usage
-
-```tsx
-import DagViewer from './DagViewer';
-import type { Step } from './types';
-
-const steps: Step[] = [
-  { id: 'a', title: 'Scrape', assigned_to: 'scout',  status: 'succeeded', depends_on: [] },
-  { id: 'b', title: 'Write',  assigned_to: 'quill',  status: 'running',   depends_on: ['a'] },
-  { id: 'c', title: 'Review', assigned_to: 'observer', status: 'queued', depends_on: ['b'] },
-];
-
-<DagViewer steps={steps} title="My pipeline" />
-```
-
-### Props
-
-| Prop    | Type     | Required | Description                             |
-|---------|----------|----------|-----------------------------------------|
-| `steps` | `Step[]` | ✅        | Array of steps with dependency info     |
-| `title` | `string` | ✗        | Optional chart heading shown above graph|
-
----
-
-## Data types
-
-```ts
-// types.ts
-interface Step {
-  id: string;           // unique, used in depends_on references
-  title: string;
-  assigned_to: string;  // agent name
-  status: 'queued' | 'running' | 'succeeded' | 'failed' | 'skipped';
-  depends_on: string[]; // IDs of upstream steps
-  result?: string;      // optional output summary
+interface Edge {
+  from: string
+  to: string
 }
 ```
 
----
+## Dev
 
-## Integrating with Supabase
-
-Replace `allMissions` mock data with a live query:
-
-```ts
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-const { data: missions } = await supabase
-  .from('missions')
-  .select('*, steps(*)')
-  .order('created_at', { ascending: false });
+```bash
+pnpm install
+pnpm --filter @x-skynet/dag-viewer dev
 ```
 
----
+Open http://localhost:5173
 
-## Tech stack
+## Build
 
-| Tool         | Version  | Purpose                        |
-|--------------|----------|--------------------------------|
-| React        | 18       | UI framework                   |
-| Mermaid.js   | 10       | DAG diagram rendering (SVG)    |
-| Vite         | 5        | Dev server + bundler           |
-| TypeScript   | 5        | Type safety                    |
+```bash
+pnpm --filter @x-skynet/dag-viewer build
+```
 
----
+## Production Integration
 
-*Part of the [X-Skynet](https://github.com/ds0857/x-skynet) project. Phase 2, task P2-07.*
+Replace `DEMO_RUNS` in `App.tsx` with data fetched from Supabase or the X-Skynet API:
+
+```typescript
+const { data } = await supabase.from('dag_runs').select('*, nodes(*), edges(*)')
+```

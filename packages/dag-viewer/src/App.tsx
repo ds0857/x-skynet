@@ -1,117 +1,324 @@
 /**
- * App.tsx — X-Skynet DAG Run Viewer
+ * App.tsx — X-Skynet DAG Run Viewer root component (P2-07)
  *
- * Displays multiple mission DAGs side-by-side using mock data.
- * In production, replace `allMissions` with data fetched from Supabase:
+ * Layout:
+ *   ┌──────────────────────────────────────────────────┐
+ *   │  Header (brand + version)                        │
+ *   ├──────────────┬───────────────────────────────────┤
+ *   │  RunList     │  DagGraph + node detail table     │
+ *   │  (sidebar)   │  (main panel)                     │
+ *   └──────────────┴───────────────────────────────────┘
  *
- *   const { data } = await supabase.from('missions').select('*, steps(*)')
+ * Data source: `DEMO_RUNS` mock array below.
+ * In production, replace with data fetched from Supabase or a REST API.
  */
 
 import React, { useState } from 'react';
-import DagViewer from './DagViewer';
-import { allMissions } from './mockData';
-import type { Mission } from './types';
-import './app.css';
+import DagGraph from './components/DagGraph';
+import RunList from './components/RunList';
+import StatusBadge from './components/StatusBadge';
+import type { DAGRun } from './types/dag';
 
-// ── Status badge ─────────────────────────────────────────────────────────────
+// ── Demo data ─────────────────────────────────────────────────────────────────
 
-function missionStatus(mission: Mission): { label: string; color: string } {
-  const statuses = mission.steps.map((s) => s.status);
-  if (statuses.some((s) => s === 'failed'))   return { label: 'FAILED',     color: '#ef4444' };
-  if (statuses.some((s) => s === 'running'))  return { label: 'RUNNING',    color: '#3b82f6' };
-  if (statuses.every((s) => s === 'succeeded')) return { label: 'DONE',     color: '#22c55e' };
-  return { label: 'QUEUED', color: '#94a3b8' };
-}
+const DEMO_RUNS: DAGRun[] = [
+  {
+    id: 'run-001',
+    name: 'Market Research Pipeline',
+    status: 'running',
+    startedAt: '2026-02-23T03:00:00Z',
+    nodes: [
+      { id: 'n1', label: 'Ingest sources',    status: 'succeeded', type: 'trigger' },
+      { id: 'n2', label: 'Scout web',          status: 'succeeded', type: 'agent'   },
+      { id: 'n3', label: 'Write report',       status: 'running',   type: 'agent'   },
+      { id: 'n4', label: 'QA review',          status: 'queued',    type: 'task'    },
+      { id: 'n5', label: 'Publish',            status: 'queued',    type: 'task'    },
+    ],
+    edges: [
+      { from: 'n1', to: 'n2' },
+      { from: 'n2', to: 'n3' },
+      { from: 'n3', to: 'n4' },
+      { from: 'n4', to: 'n5' },
+    ],
+  },
+  {
+    id: 'run-002',
+    name: 'Parallel Data Pipeline',
+    status: 'running',
+    startedAt: '2026-02-23T04:00:00Z',
+    nodes: [
+      { id: 'n1', label: 'Raw data ingest', status: 'succeeded', type: 'trigger' },
+      { id: 'n2', label: 'Sentiment analysis', status: 'succeeded', type: 'agent' },
+      { id: 'n3', label: 'Event summary',    status: 'running',   type: 'agent'   },
+      { id: 'n4', label: 'Merge & publish',  status: 'queued',    type: 'task'    },
+    ],
+    edges: [
+      { from: 'n1', to: 'n2' },
+      { from: 'n1', to: 'n3' },
+      { from: 'n2', to: 'n4' },
+      { from: 'n3', to: 'n4' },
+    ],
+  },
+  {
+    id: 'run-003',
+    name: 'Social Media Campaign',
+    status: 'failed',
+    startedAt: '2026-02-23T02:00:00Z',
+    completedAt: '2026-02-23T02:45:00Z',
+    nodes: [
+      { id: 'n1', label: 'Draft copy',        status: 'succeeded', type: 'agent'   },
+      { id: 'n2', label: 'Compliance check',  status: 'failed',    type: 'task'    },
+      { id: 'n3', label: 'Schedule posts',    status: 'queued',    type: 'task'    },
+    ],
+    edges: [
+      { from: 'n1', to: 'n2' },
+      { from: 'n2', to: 'n3' },
+    ],
+  },
+  {
+    id: 'run-004',
+    name: 'Full Deployment Flow',
+    status: 'succeeded',
+    startedAt: '2026-02-23T01:00:00Z',
+    completedAt: '2026-02-23T01:30:00Z',
+    nodes: [
+      { id: 'n1', label: 'Trigger CI',        status: 'succeeded', type: 'trigger' },
+      { id: 'n2', label: 'Build image',        status: 'succeeded', type: 'task'    },
+      { id: 'n3', label: 'Run tests',          status: 'succeeded', type: 'task'    },
+      { id: 'n4', label: 'Deploy staging',     status: 'succeeded', type: 'task'    },
+      { id: 'n5', label: 'Smoke test',         status: 'succeeded', type: 'agent'   },
+      { id: 'n6', label: 'Deploy production',  status: 'succeeded', type: 'task'    },
+    ],
+    edges: [
+      { from: 'n1', to: 'n2' },
+      { from: 'n1', to: 'n3' },
+      { from: 'n2', to: 'n4' },
+      { from: 'n3', to: 'n4' },
+      { from: 'n4', to: 'n5' },
+      { from: 'n5', to: 'n6' },
+    ],
+  },
+];
 
-// ── Component ─────────────────────────────────────────────────────────────────
+// ── App ───────────────────────────────────────────────────────────────────────
 
 const App: React.FC = () => {
-  const [selected, setSelected] = useState<string>(allMissions[0].id);
-  const mission = allMissions.find((m) => m.id === selected) ?? allMissions[0];
+  const [selectedId, setSelectedId] = useState<string>(DEMO_RUNS[0].id);
+  const run = DEMO_RUNS.find((r) => r.id === selectedId) ?? DEMO_RUNS[0];
+
+  const duration =
+    run.startedAt && run.completedAt
+      ? Math.round(
+          (new Date(run.completedAt).getTime() - new Date(run.startedAt).getTime()) / 1000,
+        ) + 's'
+      : run.startedAt
+      ? 'in progress'
+      : null;
 
   return (
-    <div className="app-root">
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100vh',
+        background: '#020617',
+        color: '#f1f5f9',
+        fontFamily: "'Inter', system-ui, sans-serif",
+        overflow: 'hidden',
+      }}
+    >
       {/* ── Header ── */}
-      <header className="app-header">
-        <div className="app-header-brand">
-          <span className="app-logo">✦</span>
-          <span>X-Skynet</span>
-          <span className="app-header-sub">DAG Run Viewer</span>
+      <header
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 20px',
+          height: '52px',
+          borderBottom: '1px solid #1e293b',
+          background: '#0a0f1e',
+          flexShrink: 0,
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <span style={{ fontSize: '18px' }}>✦</span>
+          <span style={{ fontWeight: 700, fontSize: '15px', color: '#f1f5f9' }}>
+            X-Skynet
+          </span>
+          <span
+            style={{
+              fontSize: '12px',
+              color: '#475569',
+              borderLeft: '1px solid #334155',
+              paddingLeft: '10px',
+            }}
+          >
+            DAG Run Viewer
+          </span>
         </div>
-        <span className="app-version">v0.1.0 · P2-07</span>
+        <span style={{ fontSize: '11px', color: '#334155', fontFamily: 'monospace' }}>
+          v0.1.0 · P2-07
+        </span>
       </header>
 
-      <div className="app-body">
-        {/* ── Sidebar — mission list ── */}
-        <aside className="app-sidebar">
-          <p className="sidebar-label">Missions</p>
-          <ul className="mission-list">
-            {allMissions.map((m) => {
-              const badge = missionStatus(m);
-              return (
-                <li
-                  key={m.id}
-                  className={`mission-item ${m.id === selected ? 'mission-item--active' : ''}`}
-                  onClick={() => setSelected(m.id)}
-                >
-                  <span className="mission-item-title">{m.title}</span>
-                  <span
-                    className="mission-item-badge"
-                    style={{ color: badge.color, borderColor: badge.color }}
-                  >
-                    {badge.label}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-        </aside>
+      {/* ── Body ── */}
+      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+        {/* Sidebar */}
+        <RunList
+          runs={DEMO_RUNS}
+          selectedId={selectedId}
+          onSelect={setSelectedId}
+        />
 
-        {/* ── Main — DAG diagram ── */}
-        <main className="app-main">
-          <div className="mission-meta">
-            <h2 className="mission-title">{mission.title}</h2>
-            <div className="mission-info">
-              <span>Proposed by <strong>{mission.proposed_by}</strong></span>
-              <span>·</span>
-              <span>{new Date(mission.created_at).toLocaleString()}</span>
-              <span>·</span>
-              <span>{mission.steps.length} step{mission.steps.length !== 1 ? 's' : ''}</span>
-            </div>
+        {/* Main panel */}
+        <main
+          style={{
+            flex: 1,
+            overflowY: 'auto',
+            padding: '20px 24px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px',
+          }}
+        >
+          {/* Run header */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              flexWrap: 'wrap',
+            }}
+          >
+            <h2
+              style={{
+                margin: 0,
+                fontSize: '18px',
+                fontWeight: 700,
+                color: '#f1f5f9',
+              }}
+            >
+              {run.name}
+            </h2>
+            <StatusBadge status={run.status} size="md" />
+            {duration && (
+              <span style={{ fontSize: '12px', color: '#475569' }}>
+                ⏱ {duration}
+              </span>
+            )}
           </div>
 
-          <DagViewer steps={mission.steps} title={`DAG: ${mission.title}`} />
+          {/* Meta row */}
+          <div
+            style={{
+              display: 'flex',
+              gap: '20px',
+              fontSize: '12px',
+              color: '#64748b',
+            }}
+          >
+            {run.startedAt && (
+              <span>
+                Started:{' '}
+                <strong style={{ color: '#94a3b8' }}>
+                  {new Date(run.startedAt).toLocaleString()}
+                </strong>
+              </span>
+            )}
+            <span>
+              Nodes: <strong style={{ color: '#94a3b8' }}>{run.nodes.length}</strong>
+            </span>
+            <span>
+              Edges: <strong style={{ color: '#94a3b8' }}>{run.edges.length}</strong>
+            </span>
+          </div>
 
-          {/* ── Step table ── */}
-          <div className="step-table-wrapper">
-            <table className="step-table">
+          {/* DAG Graph */}
+          <DagGraph run={run} />
+
+          {/* Node table */}
+          <div
+            style={{
+              background: '#0f172a',
+              border: '1px solid #1e293b',
+              borderRadius: '8px',
+              overflow: 'hidden',
+            }}
+          >
+            <div
+              style={{
+                padding: '10px 16px',
+                fontSize: '11px',
+                fontWeight: 700,
+                letterSpacing: '0.06em',
+                color: '#475569',
+                textTransform: 'uppercase',
+                borderBottom: '1px solid #1e293b',
+              }}
+            >
+              Nodes
+            </div>
+            <table
+              style={{
+                width: '100%',
+                borderCollapse: 'collapse',
+                fontSize: '13px',
+              }}
+            >
               <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Title</th>
-                  <th>Assigned to</th>
-                  <th>Status</th>
-                  <th>Depends on</th>
-                  <th>Result</th>
+                <tr
+                  style={{
+                    borderBottom: '1px solid #1e293b',
+                    color: '#64748b',
+                    fontSize: '11px',
+                    textTransform: 'uppercase',
+                  }}
+                >
+                  {['ID', 'Label', 'Type', 'Status'].map((h) => (
+                    <th
+                      key={h}
+                      style={{ textAlign: 'left', padding: '8px 16px', fontWeight: 600 }}
+                    >
+                      {h}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
-                {mission.steps.map((step) => (
-                  <tr key={step.id} className={`step-row step-row--${step.status}`}>
-                    <td className="step-id">{step.id}</td>
-                    <td>{step.title}</td>
-                    <td>{step.assigned_to}</td>
-                    <td>
-                      <span className={`status-chip status-chip--${step.status}`}>
-                        {step.status}
-                      </span>
+                {run.nodes.map((node, i) => (
+                  <tr
+                    key={node.id}
+                    style={{
+                      borderBottom:
+                        i < run.nodes.length - 1 ? '1px solid #1e293b' : 'none',
+                    }}
+                  >
+                    <td
+                      style={{
+                        padding: '9px 16px',
+                        fontFamily: 'monospace',
+                        color: '#94a3b8',
+                        fontSize: '12px',
+                      }}
+                    >
+                      {node.id}
                     </td>
-                    <td className="step-deps">
-                      {step.depends_on.length === 0
-                        ? <span className="step-dep-none">—</span>
-                        : step.depends_on.join(', ')}
+                    <td style={{ padding: '9px 16px', color: '#e2e8f0' }}>
+                      {node.label}
                     </td>
-                    <td className="step-result">{step.result ?? '—'}</td>
+                    <td
+                      style={{
+                        padding: '9px 16px',
+                        color: '#64748b',
+                        fontSize: '12px',
+                        fontStyle: 'italic',
+                      }}
+                    >
+                      {node.type}
+                    </td>
+                    <td style={{ padding: '9px 16px' }}>
+                      <StatusBadge status={node.status} />
+                    </td>
                   </tr>
                 ))}
               </tbody>
