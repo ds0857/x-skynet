@@ -26,6 +26,7 @@
     "chalk": "^5.3.0",
     "commander": "^11.1.0",
     "ora": "^8.0.1",
+    "@clack/prompts": "^0.9.0",
     "@xskynet/contracts": "workspace:*",
     "@xskynet/core": "workspace:*",
     "@xskynet/plugin-shell": "workspace:*",
