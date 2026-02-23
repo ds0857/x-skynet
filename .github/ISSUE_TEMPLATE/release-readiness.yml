@@ -1,0 +1,75 @@
+name: "Release Readiness Checklist"
+description: "Pre-release readiness gate: verify scope, testing, docs, ops, comms"
+labels: ["release", "readiness"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Release Readiness
+        Use this form to validate that the release candidate is ready to ship. Link evidence in each section.
+  - type: input
+    id: version
+    attributes:
+      label: Release version (semver)
+      description: e.g. v0.2.0
+      placeholder: vX.Y.Z
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope & Changes
+      description: Summarize the changes included in this release. Link milestone, changelog, or PR list.
+      placeholder: |
+        - Milestone: ...
+        - Changelog PR: ...
+        - Notable changes: ...
+    validations:
+      required: true
+  - type: checkboxes
+    id: qa
+    attributes:
+      label: QA & Testing
+      options:
+        - label: All unit tests passing in CI
+        - label: Manual smoke test of critical paths completed
+        - label: Backwards compatibility confirmed or breaking changes documented
+        - label: Security scan shows no new high/critical issues
+    validations:
+      required: true
+  - type: textarea
+    id: docs
+    attributes:
+      label: Docs & Communications
+      description: Link to docs/release-readiness.md with filled evidence and any public comms draft
+      placeholder: |
+        - Release notes draft: link
+        - Migration guide (if applicable): link
+        - docs/release-readiness.md: link
+    validations:
+      required: true
+  - type: checkboxes
+    id: ops
+    attributes:
+      label: Operations
+      options:
+        - label: Rollout plan documented (how to deploy, canary steps)
+        - label: Rollback plan documented (how to revert)
+        - label: Monitoring/alerts updated for new/changed components
+        - label: Incident playbook updated (if impacted)
+    validations:
+      required: true
+  - type: textarea
+    id: risks
+    attributes:
+      label: Risks & Mitigations
+      description: Enumerate top risks and how we mitigate/monitor them
+  - type: input
+    id: approver
+    attributes:
+      label: Approver (Go/No-Go owner)
+      description: GitHub handle of approver responsible for final decision
+      placeholder: @owner
+    validations:
+      required: true

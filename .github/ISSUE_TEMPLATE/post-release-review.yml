@@ -1,0 +1,54 @@
+name: "Post-Release Review"
+description: "Collect outcomes and learnings after release"
+labels: ["release", "post-release"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Post-Release Review
+        Summarize what happened during and after the release. Capture metrics and learnings.
+  - type: input
+    id: version
+    attributes:
+      label: Release version
+      placeholder: vX.Y.Z
+    validations:
+      required: true
+  - type: input
+    id: window
+    attributes:
+      label: Observation window
+      placeholder: e.g., First 72 hours post-deploy
+    validations:
+      required: true
+  - type: textarea
+    id: metrics
+    attributes:
+      label: Outcome metrics
+      description: SLOs, error rates, performance, adoption, support tickets, incidents
+      placeholder: |
+        - API error rate: ...
+        - Latency P95: ...
+        - Support tickets: ...
+        - Incidents: ...
+    validations:
+      required: true
+  - type: textarea
+    id: incidents
+    attributes:
+      label: Incidents & mitigations
+      placeholder: |
+        - Incident #123: root cause, timeline, fix, follow-ups
+  - type: textarea
+    id: learnings
+    attributes:
+      label: Learnings & improvements
+      placeholder: What went well? What to improve in process/tooling?
+  - type: input
+    id: approver
+    attributes:
+      label: Approver
+      placeholder: @owner
+    validations:
+      required: true
