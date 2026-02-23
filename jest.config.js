@@ -43,7 +43,14 @@ export default {
       statements: 80,
     },
   },
-  coveragePathIgnorePatterns: ['/node_modules/', '/dist/', '/examples/', '/tests/'],
+  coveragePathIgnorePatterns: [
+    '/node_modules/',
+    '/dist/',
+    '/examples/',
+    '/tests/',
+    // Server entry point — starts HTTP server at module level; not unit-testable
+    'packages/web-ui/src/index\\.ts',
+  ],
   setupFilesAfterEnv: [],
   verbose: true,
 };
