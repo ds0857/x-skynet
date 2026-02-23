@@ -2,9 +2,12 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import * as os from 'os';
 import { EventEmitter } from 'events';
+import type { Plan } from '@xskynet/contracts';
+import type { XSkynetRuntime } from './runtime.js';
 
 export interface QueuedTask {
   id: string;
+  /** Task type: 'plan' routes to XSkynetRuntime.execute(), all others echo the payload. */
   type: string;
   payload: Record<string, unknown>;
   retries: number;
@@ -12,7 +15,8 @@ export interface QueuedTask {
   createdAt: string;
 }
 
-export interface TaskResult {
+/** Result record persisted to ~/.xskynet/runs/{taskId}.json */
+export interface OrchestratorRun {
   taskId: string;
   success: boolean;
   output: unknown;
@@ -25,12 +29,18 @@ export interface OrchestratorConfig {
   stateDir?: string;
   pollIntervalMs?: number;
   maxConcurrent?: number;
+  /**
+   * Optional XSkynetRuntime instance.
+   * When provided, tasks with type='plan' are routed to runtime.execute().
+   */
+  runtime?: XSkynetRuntime;
 }
 
 export class Orchestrator extends EventEmitter {
   private readonly stateDir: string;
   private readonly pollIntervalMs: number;
   private readonly maxConcurrent: number;
+  private readonly runtime: XSkynetRuntime | undefined;
   private running = false;
   private pollTimer: ReturnType<typeof setInterval> | null = null;
   private activeCount = 0;
@@ -40,6 +50,7 @@ export class Orchestrator extends EventEmitter {
     this.stateDir = config.stateDir ?? path.join(os.homedir(), '.xskynet');
     this.pollIntervalMs = config.pollIntervalMs ?? 2000;
     this.maxConcurrent = config.maxConcurrent ?? 1;
+    this.runtime = config.runtime;
   }
 
   get queueFile(): string {
@@ -90,7 +101,7 @@ export class Orchestrator extends EventEmitter {
     const startMs = Date.now();
     try {
       const output = await this.executeTask(task);
-      const result: TaskResult = {
+      const result: OrchestratorRun = {
         taskId: task.id,
         success: true,
         output,
@@ -108,7 +119,7 @@ export class Orchestrator extends EventEmitter {
         await this.writeQueue(retryQueue);
         this.emit('task:retry', task);
       } else {
-        const result: TaskResult = {
+        const result: OrchestratorRun = {
           taskId: task.id,
           success: false,
           output: null,
@@ -124,7 +135,17 @@ export class Orchestrator extends EventEmitter {
     }
   }
 
+  /**
+   * Execute a single task.
+   * - If type is 'plan' and a runtime is configured, delegates to XSkynetRuntime.execute().
+   * - Otherwise echoes the payload (override in subclasses for custom behaviour).
+   */
   protected async executeTask(task: QueuedTask): Promise<unknown> {
+    if (task.type === 'plan' && this.runtime) {
+      // Payload is expected to be a serialised Plan from @xskynet/contracts
+      return this.runtime.execute(task.payload as unknown as Plan);
+    }
+    // Default: echo payload — override this method for custom execution logic
     return { type: task.type, payload: task.payload, executedAt: new Date().toISOString() };
   }
 
@@ -142,7 +163,7 @@ export class Orchestrator extends EventEmitter {
     await fs.writeFile(this.queueFile, JSON.stringify(queue, null, 2));
   }
 
-  async writeResult(result: TaskResult): Promise<void> {
+  async writeResult(result: OrchestratorRun): Promise<void> {
     await fs.mkdir(this.runsDir, { recursive: true });
     const file = path.join(this.runsDir, `${result.taskId}.json`);
     await fs.writeFile(file, JSON.stringify(result, null, 2));

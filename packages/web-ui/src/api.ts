@@ -37,38 +37,36 @@ export interface Task {
   status: 'pending' | 'in-progress' | 'done' | 'failed';
 }
 
+/**
+ * Development fallback data — returned only when no real state file exists.
+ * Uses generic names so framework users don't see project-internal agent names.
+ * @internal
+ */
 export function getMockAgents(): Agent[] {
   return [
-    { id: 'minion',   status: 'healthy',  lastHeartbeat: new Date(Date.now() -  30_000).toISOString() },
-    { id: 'sage',     status: 'healthy',  lastHeartbeat: new Date(Date.now() -  45_000).toISOString() },
-    { id: 'scout',    status: 'degraded', lastHeartbeat: new Date(Date.now() - 300_000).toISOString() },
-    { id: 'quill',    status: 'healthy',  lastHeartbeat: new Date(Date.now() -  60_000).toISOString() },
-    { id: 'xalt',     status: 'offline',  lastHeartbeat: new Date(Date.now() - 900_000).toISOString() },
-    { id: 'observer', status: 'healthy',  lastHeartbeat: new Date(Date.now() -  20_000).toISOString() },
+    { id: 'agent-1', status: 'healthy',  lastHeartbeat: new Date(Date.now() -  30_000).toISOString() },
+    { id: 'agent-2', status: 'healthy',  lastHeartbeat: new Date(Date.now() -  45_000).toISOString() },
+    { id: 'agent-3', status: 'degraded', lastHeartbeat: new Date(Date.now() - 300_000).toISOString() },
   ];
 }
 
+/** @internal */
 export function getMockRuns(): Run[] {
-  const statuses: Run['status'][] = [
-    'success', 'success', 'failed', 'running', 'success',
-    'pending', 'success', 'failed', 'success', 'success',
-  ];
+  const statuses: Run['status'][] = ['success', 'success', 'failed', 'running', 'success'];
   return statuses.map((status, i) => ({
     id: `run-${String(i + 1).padStart(3, '0')}`,
     status,
-    steps: (i % 7) + 2,
+    steps: (i % 5) + 2,
     startedAt: new Date(Date.now() - i * 600_000).toISOString(),
   }));
 }
 
+/** @internal */
 export function getMockTasks(): Task[] {
   return [
-    { id: 'T-001', title: 'Implement P4-03 Web UI',      assignee: 'nova',     status: 'in-progress' },
-    { id: 'T-002', title: 'Fix DAG cycle detection',     assignee: 'minion',   status: 'done'        },
-    { id: 'T-003', title: 'Write SDK docs',              assignee: 'quill',    status: 'pending'     },
-    { id: 'T-004', title: 'Add Telegram plugin tests',   assignee: 'observer', status: 'pending'     },
-    { id: 'T-005', title: 'Plugin interface refactor',   assignee: 'sage',     status: 'done'        },
-    { id: 'T-006', title: 'Memory plugin research',      assignee: 'scout',    status: 'failed'      },
+    { id: 'T-001', title: 'Example task A', assignee: 'agent-1', status: 'in-progress' },
+    { id: 'T-002', title: 'Example task B', assignee: 'agent-2', status: 'pending'     },
+    { id: 'T-003', title: 'Example task C', assignee: 'agent-3', status: 'done'        },
   ];
 }
 
@@ -88,7 +86,13 @@ export function json(res: ServerResponse, data: unknown, status = 200): void {
 export async function handleAgents(_req: IncomingMessage, res: ServerResponse): Promise<void> {
   const state = await readAgentState();
   if (state.agents.length > 0) {
-    json(res, state.agents);
+    // Normalise AgentRecord → Agent: ensure lastHeartbeat is always a string
+    const agents: Agent[] = state.agents.map(a => ({
+      id: a.id,
+      status: a.status,
+      lastHeartbeat: a.lastHeartbeat ?? new Date().toISOString(),
+    }));
+    json(res, agents);
   } else {
     json(res, getMockAgents());
   }
@@ -97,7 +101,14 @@ export async function handleAgents(_req: IncomingMessage, res: ServerResponse): 
 export async function handleRuns(_req: IncomingMessage, res: ServerResponse): Promise<void> {
   const runs = await readRuns();
   if (runs.length > 0) {
-    json(res, runs);
+    // Normalise RunRecord → Run shape
+    const mapped: Run[] = runs.map(r => ({
+      id: r.taskId,
+      status: r.success ? 'success' : 'failed',
+      steps: 1,
+      startedAt: r.completedAt,
+    } as Run));
+    json(res, mapped);
   } else {
     json(res, getMockRuns());
   }
@@ -106,7 +117,14 @@ export async function handleRuns(_req: IncomingMessage, res: ServerResponse): Pr
 export async function handleTasks(_req: IncomingMessage, res: ServerResponse): Promise<void> {
   const queue = await readQueue();
   if (queue.length > 0) {
-    json(res, queue);
+    // Normalise QueueRecord → Task shape
+    const tasks: Task[] = queue.map(q => ({
+      id: q.id,
+      title: q.type,
+      assignee: 'system',
+      status: 'pending',
+    }));
+    json(res, tasks);
   } else {
     json(res, getMockTasks());
   }

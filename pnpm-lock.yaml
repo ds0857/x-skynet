@@ -92,6 +92,19 @@ importers:
         specifier: ^5.3.3
         version: 5.9.3
 
+  examples/self-healing:
+    dependencies:
+      '@xskynet/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+    devDependencies:
+      tsx:
+        specifier: ^4.7.0
+        version: 4.21.0
+      typescript:
+        specifier: ^5.3.3
+        version: 5.9.3
+
   packages/cli:
     dependencies:
       '@xskynet/contracts':

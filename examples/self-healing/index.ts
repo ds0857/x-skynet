@@ -1,51 +1,83 @@
-import { AcceptanceGate } from '../../packages/core/src/acceptance-gate.js';
-import { TestFeedback } from '../../packages/core/src/test-feedback.js';
+/**
+ * X-Skynet Self-Healing Demo
+ *
+ * Demonstrates the autonomous self-repair cycle:
+ * 1. A task produces a buggy result
+ * 2. AcceptanceGate rejects it and explains why
+ * 3. TestFeedback generates a fix prompt for an AI agent
+ * 4. The bug is corrected
+ * 5. AcceptanceGate verifies the fixed result
+ *
+ * Run: pnpm --filter @xskynet/example-self-healing start
+ */
+import { AcceptanceGate, TestFeedback } from '@xskynet/core';
 import * as fs from 'fs/promises';
 
-async function main() {
+async function main(): Promise<void> {
   console.log('=== X-Skynet Self-Healing Demo ===\n');
 
   const gate = new AcceptanceGate();
   const feedback = new TestFeedback();
 
-  // Step 1: Create a file with a bug
-  const buggyCode = 'export function multiply(a: number, b: number): number { return a + b; /* BUG: should be * */ }';
-  await fs.writeFile('/tmp/demo-multiply.ts', buggyCode);
-  console.log('Step 1: Created buggy function (multiply uses + instead of *)');
+  // ── Step 1: Simulate a task that produced a buggy file ────────────────────
+  const buggyCode =
+    '// BUG: uses addition instead of multiplication\n' +
+    'export function multiply(a, b) { return a + b; }\n';
+  await fs.writeFile('/tmp/xskynet-demo-multiply.js', buggyCode);
+  console.log('Step 1: Task output written (contains bug: multiply uses + instead of *)');
 
-  // Step 2: Simulate test failure
-  const buggyResult = { success: false, output: null, error: 'multiply(3, 4) expected 12 but got 7' };
-  const firstCheck = await gate.verify(buggyResult);
-  console.log('Step 2: Acceptance check on buggy code:', firstCheck.passed ? 'PASSED' : 'FAILED - ' + firstCheck.reason);
+  // ── Step 2: AcceptanceGate rejects the result ─────────────────────────────
+  const buggyTaskResult = {
+    success: false,
+    output: null,
+    error: 'Test failed: multiply(3, 4) expected 12 but received 7',
+  };
+  const rejection = await gate.verify(buggyTaskResult);
+  console.log(`Step 2: Acceptance check → ${rejection.passed ? 'PASSED ✅' : 'REJECTED ❌'}`);
+  console.log(`        Reason: ${rejection.reason}\n`);
 
-  // Step 3: Generate fix prompt
-  const fixPrompt = feedback.generateFixPrompt([{
-    testName: 'multiply returns correct product',
-    errorMessage: 'Expected 12, received 7',
-    filePath: '/tmp/demo-multiply.ts',
-  }]);
-  console.log('Step 3: Fix prompt generated:\n' + fixPrompt.slice(0, 200));
+  // ── Step 3: TestFeedback generates a fix prompt ───────────────────────────
+  const fixPrompt = feedback.generateFixPrompt([
+    {
+      testName: 'multiply returns correct product',
+      errorMessage: 'Expected: 12  Received: 7',
+      filePath: '/tmp/xskynet-demo-multiply.js',
+    },
+  ]);
+  console.log('Step 3: Fix prompt generated for AI agent:');
+  console.log('        ' + fixPrompt.split('\n').join('\n        '));
 
-  // Step 4: Auto-fix (simulate agent applying the fix)
-  const fixedCode = buggyCode.replace('a + b', 'a * b');
-  await fs.writeFile('/tmp/demo-multiply.ts', fixedCode);
-  console.log('\nStep 4: Applied fix (replaced + with *)');
+  // ── Step 4: Agent applies the fix ─────────────────────────────────────────
+  const fixedCode = buggyCode.replace('a + b', 'a * b').replace('// BUG:', '// FIXED:');
+  await fs.writeFile('/tmp/xskynet-demo-multiply.js', fixedCode);
+  console.log('\nStep 4: Agent applied fix (replaced + with *)');
 
-  // Step 5: Verify fix
-  const fixedResult = { success: true, output: 'multiply(3, 4) = 12' };
-  const secondCheck = await gate.verify(fixedResult, { requiredFiles: ['/tmp/demo-multiply.ts'] });
-  console.log('Step 5: Acceptance check after fix:', secondCheck.passed ? 'PASSED' : 'FAILED');
+  // ── Step 5: AcceptanceGate verifies the corrected result ──────────────────
+  const fixedTaskResult = {
+    success: true,
+    output: 'multiply(3, 4) = 12 ✓',
+  };
+  const acceptance = await gate.verify(fixedTaskResult, {
+    requiredFiles: ['/tmp/xskynet-demo-multiply.js'],
+    customCheck: async () => {
+      // Read the (now fixed) file and verify it uses multiplication, not addition
+      const content = await fs.readFile('/tmp/xskynet-demo-multiply.js', 'utf-8');
+      return content.includes('a * b') && !content.includes('a + b');
+    },
+  });
+  console.log(`Step 5: Acceptance check after fix → ${acceptance.passed ? 'PASSED ✅' : 'FAILED ❌'}`);
 
-  if (secondCheck.passed) {
+  // ── Summary ───────────────────────────────────────────────────────────────
+  if (acceptance.passed) {
     console.log('\n✅ Self-healing cycle complete: PASSED');
-    process.exit(0);
+    console.log('   Bug detected → Fix prompt generated → Fix applied → Verified');
   } else {
-    console.error('\n❌ Self-healing failed:', secondCheck.reason);
+    console.error('\n❌ Self-healing failed:', acceptance.reason);
     process.exit(1);
   }
 }
 
-main().catch(err => {
-  console.error(err);
+main().catch((err: unknown) => {
+  console.error('Fatal:', err);
   process.exit(1);
 });
