@@ -9,6 +9,7 @@ import { registerAgentsCommand } from './commands/agents.js';
 import { registerStatusCommand } from './commands/status.js';
 import { registerServeCommand } from './commands/serve.js';
 import { registerDoctorCommand } from './commands/doctor.js';
+import { registerCompletionCommand } from './commands/completion.js';
 import pkg from "../package.json" with { type: "json" };
 
 // ─── Friendly error messages ─────────────────────────────────────────────────
@@ -100,6 +101,7 @@ registerAgentsCommand(program);
 registerStatusCommand(program);
 registerServeCommand(program);
 registerDoctorCommand(program);
+registerCompletionCommand(program);
 
 program
   .command('version')

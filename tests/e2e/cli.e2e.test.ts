@@ -232,4 +232,100 @@ describe('CLI E2E', () => {
     expect(output).toMatch(/status/);
     expect(output).toMatch(/version/);
   }, 25000);
+
+  // ── Test: doctor command ─────────────────────────────────────────────────
+  it('xskynet doctor returns JSON summary with checks array', () => {
+    const res = runCli(['doctor']);
+
+    expect(res.status).toBe(0);
+
+    const line = res.stdout.trim().split('\n').find((l) => l.startsWith('{'));
+    expect(line).toBeDefined();
+
+    const parsed = JSON.parse(line!);
+    expect(typeof parsed.ok).toBe('boolean');
+    expect(Array.isArray(parsed.checks)).toBe(true);
+    expect(parsed.checks.length).toBeGreaterThan(0);
+
+    // Each check should have label, detail, and severity
+    for (const check of parsed.checks) {
+      expect(typeof check.label).toBe('string');
+      expect(typeof check.detail).toBe('string');
+      expect(['ok', 'warn', 'error']).toContain(check.severity);
+    }
+  }, 25000);
+
+  it('xskynet doctor human-readable output contains check icons', () => {
+    const res = runCliHuman(['doctor']);
+
+    // Exit code 0 as long as there are no errors (node version is fine)
+    const output = res.stdout + res.stderr;
+    // Should contain the command header
+    expect(output).toMatch(/doctor/i);
+    // Should show Node.js check (always present)
+    expect(output).toMatch(/Node/i);
+  }, 25000);
+
+  // ── Test: completion command ─────────────────────────────────────────────
+  it('xskynet completion bash outputs a bash script', () => {
+    const res = runCliHuman(['completion', 'bash']);
+
+    expect(res.status).toBe(0);
+    const output = res.stdout;
+    // Should contain bash completion function
+    expect(output).toContain('_xskynet_completions');
+    expect(output).toContain('complete -F _xskynet_completions xskynet');
+    // Should list known commands
+    expect(output).toContain('init');
+    expect(output).toContain('doctor');
+  }, 25000);
+
+  it('xskynet completion zsh outputs a zsh script', () => {
+    const res = runCliHuman(['completion', 'zsh']);
+
+    expect(res.status).toBe(0);
+    const output = res.stdout;
+    // Should contain zsh completion function
+    expect(output).toContain('#compdef xskynet');
+    expect(output).toContain('_xskynet');
+  }, 25000);
+
+  it('xskynet completion fish outputs a fish script', () => {
+    const res = runCliHuman(['completion', 'fish']);
+
+    expect(res.status).toBe(0);
+    const output = res.stdout;
+    // Should contain fish completion directives
+    expect(output).toContain('complete -c xskynet');
+  }, 25000);
+
+  it('xskynet completion (no args) returns available shells in JSON mode', () => {
+    const res = runCli(['completion']);
+
+    expect(res.status).toBe(0);
+
+    const line = res.stdout.trim().split('\n').find((l) => l.startsWith('{'));
+    expect(line).toBeDefined();
+
+    const parsed = JSON.parse(line!);
+    expect(parsed.ok).toBe(true);
+    expect(parsed.shells).toContain('bash');
+    expect(parsed.shells).toContain('zsh');
+    expect(parsed.shells).toContain('fish');
+    expect(parsed.actions).toContain('install');
+    expect(parsed.actions).toContain('uninstall');
+  }, 25000);
+
+  it('xskynet completion <unknown> exits with error in JSON mode', () => {
+    const res = runCli(['completion', 'powershell']);
+
+    expect(res.status).toBe(1);
+
+    const line = res.stdout.trim().split('\n').find((l) => l.startsWith('{'));
+    expect(line).toBeDefined();
+
+    const parsed = JSON.parse(line!);
+    expect(parsed.ok).toBe(false);
+    expect(typeof parsed.error).toBe('string');
+  }, 25000);
 });
