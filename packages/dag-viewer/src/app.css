@@ -1,0 +1,187 @@
+/* app.css — X-Skynet DAG Viewer styles */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-base:    #0f172a;
+  --bg-surface: #1e293b;
+  --bg-border:  #334155;
+  --text-main:  #f1f5f9;
+  --text-muted: #94a3b8;
+  --accent:     #38bdf8;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  color: var(--text-main);
+  background: var(--bg-base);
+}
+
+/* ── Layout ────────────────────────────────────────── */
+.app-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--bg-border);
+}
+
+.app-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 16px;
+}
+.app-logo { color: var(--accent); font-size: 20px; }
+.app-header-sub { color: var(--text-muted); font-weight: 400; font-size: 13px; }
+.app-version { color: var(--text-muted); font-size: 12px; }
+
+.app-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ── Sidebar ────────────────────────────────────────── */
+.app-sidebar {
+  width: 220px;
+  min-width: 180px;
+  background: var(--bg-surface);
+  border-right: 1px solid var(--bg-border);
+  padding: 16px 12px;
+  overflow-y: auto;
+}
+.sidebar-label {
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: .08em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+.mission-list { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.mission-item {
+  cursor: pointer;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  transition: background .15s;
+}
+.mission-item:hover { background: #334155; }
+.mission-item--active { background: #1e3a5f; border-color: #2563eb; }
+
+.mission-item-title { display: block; font-size: 13px; margin-bottom: 4px; }
+.mission-item-badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  border: 1px solid;
+  border-radius: 4px;
+  padding: 1px 5px;
+}
+
+/* ── Main ────────────────────────────────────────────── */
+.app-main {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.mission-meta { display: flex; flex-direction: column; gap: 6px; }
+.mission-title { font-size: 20px; font-weight: 700; }
+.mission-info { display: flex; gap: 8px; color: var(--text-muted); font-size: 13px; }
+
+/* ── DagViewer ───────────────────────────────────────── */
+.dag-viewer-wrapper {
+  background: var(--bg-surface);
+  border: 1px solid var(--bg-border);
+  border-radius: 10px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.dag-viewer-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+.dag-viewer-diagram {
+  min-height: 180px;
+}
+.dag-viewer-diagram svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* ── Legend ──────────────────────────────────────────── */
+.dag-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.dag-legend-item { display: flex; align-items: center; gap: 5px; }
+.dag-legend-swatch {
+  width: 10px; height: 10px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+/* ── Step Table ──────────────────────────────────────── */
+.step-table-wrapper { overflow-x: auto; }
+.step-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.step-table th {
+  text-align: left;
+  padding: 8px 12px;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--bg-border);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: .06em;
+}
+.step-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--bg-border);
+  vertical-align: top;
+}
+.step-id { font-family: monospace; color: var(--text-muted); }
+.step-deps { font-family: monospace; color: var(--text-muted); font-size: 12px; }
+.step-dep-none { opacity: .4; }
+.step-result { color: var(--text-muted); max-width: 300px; word-break: break-word; }
+
+/* Status chips */
+.status-chip {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.status-chip--queued    { background: #1e293b; color: #94a3b8; border: 1px solid #475569; }
+.status-chip--running   { background: #1e3a8a; color: #93c5fd; border: 1px solid #3b82f6; }
+.status-chip--succeeded { background: #14532d; color: #86efac; border: 1px solid #22c55e; }
+.status-chip--failed    { background: #7f1d1d; color: #fca5a5; border: 1px solid #ef4444; }
+.status-chip--skipped   { background: #1f2937; color: #9ca3af; border: 1px solid #6b7280; }
+
+/* Row highlight */
+.step-row--failed td { background: rgba(239,68,68,.05); }
+.step-row--running td { background: rgba(59,130,246,.05); }
