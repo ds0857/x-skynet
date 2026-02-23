@@ -1,0 +1,25 @@
+# Codecov configuration for X-Skynet
+# Docs: https://docs.codecov.com/docs/codecovyml-reference
+
+# Do not post a PR comment; rely on GitHub Checks instead
+comment: false
+
+coverage:
+  status:
+    project:
+      default:
+        # Keep current overall coverage from regressing too much
+        target: auto
+        threshold: 2%
+    patch:
+      default:
+        # Require reasonable coverage on changed lines in PRs
+        target: 80%
+        threshold: 1%
+        only_pulls: true
+
+# Carry forward previous flag results when some flags are missing in a run
+# (useful with matrix builds)
+flag_management:
+  default_rules:
+    carryforward: true
