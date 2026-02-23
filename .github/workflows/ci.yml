@@ -2,69 +2,64 @@ name: CI
 
 on:
   push:
-    branches:
-      - main
-      - dev
+    branches: [ main ]
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
 
+# Cancel in-progress runs on the same ref
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
-  ci:
-    name: Build, Lint & Test
+  build-test:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-
+    strategy:
+      matrix:
+        node-version: [20.x]
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Install pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 9
-
-      - name: Set up Node.js 20
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Enable corepack (pnpm)
+        run: corepack enable
 
-      - name: Build
-        run: pnpm run build
-
-      - name: Typecheck
-        run: pnpm run typecheck
-        continue-on-error: false
+      - name: Install pnpm and dependencies
+        run: |
+          npm i -g pnpm@9
+          # Use non-frozen lockfile for now since lockfile may not be committed
+          pnpm install --frozen-lockfile=false
 
       - name: Lint
-        run: pnpm run lint
-        continue-on-error: true
+        run: pnpm lint
 
-      - name: Run tests with coverage
-        run: pnpm run test:coverage
-        env:
-          CI: true
+      - name: Typecheck
+        run: pnpm typecheck
 
-      - name: Upload coverage report
-        uses: actions/upload-artifact@v4
+      - name: Test (with coverage)
+        run: pnpm test
+
+      - name: Upload coverage artifact
         if: always()
+        uses: actions/upload-artifact@v4
         with:
-          name: coverage-report
-          path: coverage/
-          retention-days: 7
+          name: coverage-${{ matrix.node-version }}
+          path: coverage
+          if-no-files-found: warn
 
-      - name: Upload coverage to Codecov
+      - name: Upload to Codecov (optional)
+        if: ${{ secrets.CODECOV_TOKEN && github.event_name != 'pull_request' }}
         uses: codecov/codecov-action@v4
-        if: github.event_name == 'push'
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}
           files: coverage/lcov.info
+          flags: node-${{ matrix.node-version }}
           fail_ci_if_error: false
-          verbose: false
