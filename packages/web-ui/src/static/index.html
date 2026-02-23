@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>X-Skynet — Dashboard</title>
+  <style>
+    /* ── Reset / base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --border: #30363d;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --green: #3fb950;
+      --yellow: #d29922;
+      --red: #f85149;
+      --blue: #58a6ff;
+      --radius: 8px;
+      --font: 'Segoe UI', system-ui, sans-serif;
+    }
+    body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 14px; min-height: 100vh; }
+
+    /* ── Layout ── */
+    header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 24px; background: var(--surface); border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 10;
+    }
+    header h1 { font-size: 18px; font-weight: 600; letter-spacing: .5px; color: var(--blue); }
+    .ws-badge {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12px; color: var(--muted);
+    }
+    .ws-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: var(--red);
+      transition: background .3s;
+    }
+    .ws-dot.connected { background: var(--green); }
+
+    main { padding: 24px; display: flex; flex-direction: column; gap: 32px; }
+
+    section > h2 {
+      font-size: 13px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 1px; color: var(--muted); margin-bottom: 14px;
+    }
+
+    /* ── Agent cards ── */
+    #agent-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+    }
+    .agent-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 14px 16px;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .agent-header { display: flex; align-items: center; gap: 8px; font-weight: 600; }
+    .status-dot {
+      width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+    }
+    .dot-healthy  { background: var(--green); box-shadow: 0 0 6px var(--green); }
+    .dot-degraded { background: var(--yellow); }
+    .dot-offline  { background: var(--red); }
+    .agent-meta { font-size: 11px; color: var(--muted); }
+
+    /* ── Runs table ── */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td {
+      text-align: left; padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    th { font-size: 12px; color: var(--muted); font-weight: 500; }
+    td { font-size: 13px; }
+    tr:last-child td { border-bottom: none; }
+    .badge {
+      display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;
+    }
+    .badge-success { background: rgba(63,185,80,.15); color: var(--green); }
+    .badge-running { background: rgba(88,166,255,.15); color: var(--blue); }
+    .badge-failed  { background: rgba(248,81,73,.15);  color: var(--red); }
+    .badge-pending { background: rgba(139,148,158,.15); color: var(--muted); }
+    .badge-in-progress { background: rgba(88,166,255,.15); color: var(--blue); }
+    .badge-done { background: rgba(63,185,80,.15); color: var(--green); }
+
+    /* ── Task queue ── */
+    #task-list { display: flex; flex-direction: column; gap: 8px; }
+    .task-row {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 10px 14px;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .task-title { font-weight: 500; }
+    .task-assignee { color: var(--muted); font-size: 12px; }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center; padding: 20px; color: var(--muted); font-size: 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .skeleton {
+      animation: pulse 1.5s ease-in-out infinite;
+      background: var(--border);
+      border-radius: 4px;
+      height: 14px;
+    }
+    @keyframes pulse { 0%,100% { opacity:.4 } 50% { opacity:1 } }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🛰 X-Skynet Dashboard</h1>
+  <div class="ws-badge">
+    <div class="ws-dot" id="ws-dot"></div>
+    <span id="ws-label">Disconnected</span>
+    &nbsp;|&nbsp;
+    <span id="last-update">—</span>
+  </div>
+</header>
+
+<main>
+
+  <!-- Agent status cards -->
+  <section>
+    <h2>Agents</h2>
+    <div id="agent-grid">
+      <div class="skeleton" style="height:80px"></div>
+      <div class="skeleton" style="height:80px"></div>
+      <div class="skeleton" style="height:80px"></div>
+    </div>
+  </section>
+
+  <!-- Recent DAG runs -->
+  <section>
+    <h2>Recent Runs</h2>
+    <div class="table-wrap">
+      <table id="runs-table">
+        <thead>
+          <tr>
+            <th>Run ID</th>
+            <th>Status</th>
+            <th>Steps</th>
+            <th>Started</th>
+          </tr>
+        </thead>
+        <tbody id="runs-body">
+          <tr><td colspan="4" style="color:var(--muted);text-align:center">Loading…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Task queue -->
+  <section>
+    <h2>Task Queue</h2>
+    <div id="task-list">
+      <div class="skeleton" style="height:44px"></div>
+      <div class="skeleton" style="height:44px"></div>
+    </div>
+  </section>
+
+</main>
+
+<footer>X-Skynet Web UI · Real-time via WebSocket</footer>
+
+<script src="/app.js"></script>
+</body>
+</html>
