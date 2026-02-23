@@ -120,6 +120,9 @@ importers:
       '@xskynet/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@xskynet/plugin-telegram':
+        specifier: workspace:*
+        version: link:../plugin-telegram
 
   packages/dag-viewer:
     dependencies:
