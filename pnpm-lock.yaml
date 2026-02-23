@@ -198,6 +198,15 @@ importers:
         specifier: '>=5.3.0'
         version: 5.9.3
 
+  packages/plugin-interface:
+    devDependencies:
+      '@types/node':
+        specifier: ^20.11.0
+        version: 20.19.33
+      typescript:
+        specifier: ^5.3.0
+        version: 5.9.3
+
   packages/plugin-memory:
     dependencies:
       '@xskynet/contracts':
@@ -234,6 +243,8 @@ importers:
       typescript:
         specifier: ^5.3.0
         version: 5.9.3
+
+  packages/router: {}
 
   packages/sdk-js:
     dependencies:

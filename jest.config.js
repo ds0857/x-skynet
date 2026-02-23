@@ -7,6 +7,7 @@ export default {
     '^@xskynet/contracts$': '<rootDir>/packages/contracts/src/index.ts',
     '^@xskynet/core$': '<rootDir>/packages/core/src/index.ts',
     '^@xskynet/cli$': '<rootDir>/packages/cli/src/index.ts',
+    '^@x-skynet/plugin-interface$': '<rootDir>/packages/plugin-interface/src/index.ts',
     '^(\\.{1,2}/.*)\\.js$': '$1',
   },
   transform: {

@@ -8,7 +8,9 @@
       "@xskynet/cli": ["packages/cli/src/index.ts"],
       "@xskynet/plugin-claude": ["packages/plugin-claude/src/index.ts"],
       "@xskynet/plugin-http": ["packages/plugin-http/src/index.ts"],
-      "@xskynet/plugin-shell": ["packages/plugin-shell/src/index.ts"]
+      "@xskynet/plugin-shell": ["packages/plugin-shell/src/index.ts"],
+      "@x-skynet/plugin-interface": ["packages/plugin-interface/src/index.ts"],
+      "@x-skynet/router": ["packages/router/src/index.ts"]
     },
     "types": ["jest", "node"],
     "esModuleInterop": true,
