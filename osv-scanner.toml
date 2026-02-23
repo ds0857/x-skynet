@@ -1,0 +1,9 @@
+# OSV Scanner configuration — vulnerability ignore list for x-skynet
+# Review annually or when a fix becomes available upstream.
+
+# request@2.88.2 — deprecated npm package with no upstream fix published.
+# Transitively required by @cypress/request-promise (devDependency only).
+# No direct usage in production code; never shipped to end users.
+[[IgnoredVulns]]
+id = "GHSA-p8p7-x288-28g6"
+reason = "request@2.88.2 is abandoned/deprecated with no published fix. It is pulled in transitively by @cypress/request-promise as a devDependency only and is never present in production builds."
