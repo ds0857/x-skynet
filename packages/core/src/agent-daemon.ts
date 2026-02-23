@@ -17,9 +17,9 @@ export interface AgentDaemonConfig {
   /** Unique identifier for this agent. */
   agentId: string;
   /** Base URL of the X-Skynet dashboard (e.g. https://dashboard.example.com). */
-  dashboardUrl: string;
+  dashboardUrl?: string;
   /** API key sent as `x-heartbeat-key` header. */
-  heartbeatKey: string;
+  heartbeatKey?: string;
   /** Interval between heartbeats in milliseconds. Default: 60 000. */
   heartbeatIntervalMs?: number;
   /** Interval between task-queue polls in milliseconds. Default: 5 000. */
@@ -59,8 +59,8 @@ export class AgentDaemon {
   constructor(config: AgentDaemonConfig) {
     this.cfg = {
       agentId: config.agentId,
-      dashboardUrl: config.dashboardUrl,
-      heartbeatKey: config.heartbeatKey,
+      dashboardUrl: config.dashboardUrl ?? '',
+      heartbeatKey: config.heartbeatKey ?? '',
       heartbeatIntervalMs: config.heartbeatIntervalMs ?? 60_000,
       pollIntervalMs: config.pollIntervalMs ?? 5_000,
       plugins: config.plugins ?? [],
@@ -147,6 +147,7 @@ export class AgentDaemon {
    * Throws on non-2xx response so the caller can emit an error event.
    */
   async heartbeat(): Promise<void> {
+    if (!this.cfg.dashboardUrl) return; // skip when no URL configured
     const url = `${this.cfg.dashboardUrl}/api/ops/agents/${this.cfg.agentId}/heartbeat`;
     const payload: HeartbeatPayload = {
       status: 'healthy',

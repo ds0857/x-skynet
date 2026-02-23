@@ -21,7 +21,7 @@ function makeConfig(overrides: Partial<AgentDaemonConfig> = {}): AgentDaemonConf
   return {
     agentId: 'test-agent',
     dashboardUrl: 'https://dashboard.example.com',
-    apiKey: 'test-key',
+    heartbeatKey: 'test-key',
     heartbeatIntervalMs: 1_000,
     ...overrides,
   };
