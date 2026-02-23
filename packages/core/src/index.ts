@@ -4,3 +4,4 @@ export * from './event-bus.js';
 export * from './event-store.js';
 export * from './plugin-registry.js';
 export * from './errors.js';
+export * from './agent-daemon.js';

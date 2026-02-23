@@ -7,6 +7,7 @@ import { registerDevCommand } from './commands/dev.js';
 import { registerLogsCommand } from './commands/logs.js';
 import { registerAgentsCommand } from './commands/agents.js';
 import { registerStatusCommand } from './commands/status.js';
+import { registerServeCommand } from './commands/serve.js';
 import pkg from "../package.json" with { type: "json" };
 
 const program = new Command();
@@ -41,6 +42,7 @@ registerDevCommand(program);
 registerLogsCommand(program);
 registerAgentsCommand(program);
 registerStatusCommand(program);
+registerServeCommand(program);
 
 program
   .command('version')
