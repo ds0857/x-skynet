@@ -1,6 +1,15 @@
 {
   "extends": "./tsconfig.base.json",
   "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@xskynet/contracts": ["packages/contracts/src/index.ts"],
+      "@xskynet/core": ["packages/core/src/index.ts"],
+      "@xskynet/cli": ["packages/cli/src/index.ts"],
+      "@xskynet/plugin-claude": ["packages/plugin-claude/src/index.ts"],
+      "@xskynet/plugin-http": ["packages/plugin-http/src/index.ts"],
+      "@xskynet/plugin-shell": ["packages/plugin-shell/src/index.ts"]
+    },
     "types": ["jest", "node"],
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,

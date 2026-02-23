@@ -16,7 +16,11 @@ import {
   ok,
   err,
   Result,
+  ISODateTime,
 } from '../index';
+
+// Helper: cast string to branded ISODateTime for test usage
+const nowIso = (): ISODateTime => new Date().toISOString() as unknown as ISODateTime;
 
 describe('@xskynet/contracts', () => {
   describe('Status types', () => {
@@ -96,7 +100,7 @@ describe('@xskynet/contracts', () => {
       const artifact: Artifact = {
         id: 'artifact-123' as unknown as import('../index').ID,
         kind: 'file',
-        createdAt: new Date().toISOString(),
+        createdAt: nowIso(),
       };
 
       expect(artifact.id).toBe('artifact-123');
@@ -110,7 +114,7 @@ describe('@xskynet/contracts', () => {
         mime: 'text/plain',
         name: 'test-prompt.txt',
         bytes: 1024,
-        createdAt: new Date().toISOString(),
+        createdAt: nowIso(),
         metadata: { source: 'user-input' },
       };
 
@@ -125,7 +129,7 @@ describe('@xskynet/contracts', () => {
         id: 'step-001' as unknown as import('../index').ID,
         name: 'Test Step',
         status: 'idle',
-        createdAt: new Date().toISOString(),
+        createdAt: nowIso(),
       };
 
       expect(step.id).toBe('step-001');
@@ -137,7 +141,7 @@ describe('@xskynet/contracts', () => {
         id: 'step-002' as unknown as import('../index').ID,
         name: 'Failing Step',
         status: 'failed',
-        createdAt: new Date().toISOString(),
+        createdAt: nowIso(),
         error: {
           message: 'Something went wrong',
           code: 'EXECUTION_ERROR',
@@ -156,7 +160,7 @@ describe('@xskynet/contracts', () => {
         id: 'task-001' as unknown as import('../index').ID,
         name: 'Test Task',
         status: 'idle',
-        createdAt: new Date().toISOString(),
+        createdAt: nowIso(),
         steps: [],
       };
 
@@ -169,7 +173,7 @@ describe('@xskynet/contracts', () => {
         id: 'task-002' as unknown as import('../index').ID,
         name: 'High Priority Task',
         status: 'running',
-        createdAt: new Date().toISOString(),
+        createdAt: nowIso(),
         priority: 'high',
         labels: ['urgent', 'phase-1'],
         steps: [],
@@ -186,7 +190,7 @@ describe('@xskynet/contracts', () => {
         id: 'plan-001' as unknown as import('../index').ID,
         title: 'Test Plan',
         status: 'draft',
-        createdAt: new Date().toISOString(),
+        createdAt: nowIso(),
         tasks: [],
       };
 
@@ -202,7 +206,7 @@ describe('@xskynet/contracts', () => {
           id: `plan-${status}` as unknown as import('../index').ID,
           title: `Plan ${status}`,
           status,
-          createdAt: new Date().toISOString(),
+          createdAt: nowIso(),
           tasks: [],
         };
         expect(plan.status).toBe(status);
