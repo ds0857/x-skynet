@@ -277,6 +277,16 @@ importers:
         version: 5.9.3
 
   packages/web-ui:
+    dependencies:
+      '@xskynet/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@xskynet/core':
+        specifier: workspace:*
+        version: link:../core
+      '@xskynet/plugin-shell':
+        specifier: workspace:*
+        version: link:../plugin-shell
     devDependencies:
       '@types/node':
         specifier: ^20.11.0

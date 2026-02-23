@@ -6,6 +6,11 @@ import {
   readRuns,
   readQueue,
 } from './state-reader.js';
+import {
+  handleCreatePlan,
+  handleListPlans,
+  handleGetPlan,
+} from './plan-runner.js';
 
 // Static directory — set by index.ts before first request
 let _staticDir = '';
@@ -168,6 +173,32 @@ export async function handleRequest(req: IncomingMessage, res: ServerResponse): 
   const url = req.url ?? '/';
   const method = req.method ?? 'GET';
 
+  // ── Plan API (supports GET + POST) ─────────────────────────────────────────
+  if (url === '/api/plans') {
+    if (method === 'POST') {
+      await handleCreatePlan(req, res);
+      return;
+    }
+    if (method === 'GET') {
+      await handleListPlans(req, res);
+      return;
+    }
+    json(res, { error: 'Method Not Allowed' }, 405);
+    return;
+  }
+
+  // GET /api/plans/:id
+  const planMatch = url.match(/^\/api\/plans\/([^/?#]+)$/);
+  if (planMatch) {
+    if (method === 'GET') {
+      await handleGetPlan(planMatch[1], req, res);
+      return;
+    }
+    json(res, { error: 'Method Not Allowed' }, 405);
+    return;
+  }
+
+  // ── All other routes require GET ────────────────────────────────────────────
   if (method !== 'GET') {
     json(res, { error: 'Method Not Allowed' }, 405);
     return;

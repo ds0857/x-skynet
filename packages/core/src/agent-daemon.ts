@@ -217,11 +217,26 @@ export class AgentDaemon {
     this.emit('task', task);
 
     try {
-      // Delegate actual execution to subscribers; mark done when complete
+      // Execute the task by POSTing it to the local plan-execution endpoint.
+      // If dashboardUrl points to an X-Skynet server, submit the task payload
+      // as a Plan for execution. Subscribers can also intercept the 'task' event
+      // and call their own execution logic.
+      let result: unknown = null;
+      if (task.type === 'plan' && this.cfg.dashboardUrl) {
+        const execRes = await fetch(`${this.cfg.dashboardUrl}/api/plans`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(task.payload),
+        }).catch(() => null);
+        if (execRes?.ok) {
+          result = await execRes.json();
+        }
+      }
+
       await fetch(baseUrl, {
         method: 'PATCH',
         headers,
-        body: JSON.stringify({ status: 'done', completedAt: new Date().toISOString() }),
+        body: JSON.stringify({ status: 'done', completedAt: new Date().toISOString(), result }),
       });
     } catch (err) {
       await fetch(baseUrl, {

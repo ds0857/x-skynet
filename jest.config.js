@@ -8,6 +8,9 @@ export default {
     '^@xskynet/core$': '<rootDir>/packages/core/src/index.ts',
     '^@xskynet/cli$': '<rootDir>/packages/cli/src/index.ts',
     '^@x-skynet/plugin-interface$': '<rootDir>/packages/plugin-interface/src/index.ts',
+    '^@xskynet/plugin-shell$': '<rootDir>/packages/plugin-shell/src/index.ts',
+    '^@xskynet/plugin-memory$': '<rootDir>/packages/plugin-memory/src/index.ts',
+    '^@xskynet/plugin-http$': '<rootDir>/packages/plugin-http/src/index.ts',
     '^(\\.{1,2}/.*)\\.js$': '$1',
   },
   transform: {
