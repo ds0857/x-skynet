@@ -1,0 +1,128 @@
+version: "3.9"
+
+# ============================================================
+# X-Skynet Docker Compose Configuration
+# ============================================================
+# Usage:
+#   docker compose -f deploy/docker-compose.yml up -d
+#   docker compose -f deploy/docker-compose.yml logs -f agent
+# ============================================================
+
+services:
+  # ------------------------------------------------------------
+  # Agent — core X-Skynet AI agent service
+  # ------------------------------------------------------------
+  agent:
+    image: x-skynet/agent:latest
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      target: production
+    container_name: x-skynet-agent
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      LOG_LEVEL: info
+      AGENT_NAME: x-skynet-agent
+      MAX_WORKERS: "4"
+      TASK_QUEUE_SIZE: "100"
+      HEARTBEAT_INTERVAL: "30"
+      REDIS_URL: redis://redis:6379
+      # API Keys — override via .env file or environment
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      DASHSCOPE_API_KEY: ${DASHSCOPE_API_KEY:-}
+    volumes:
+      - agent-data:/app/data
+      - agent-logs:/app/logs
+    networks:
+      - x-skynet-net
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # ------------------------------------------------------------
+  # Dashboard — X-Skynet monitoring & control dashboard
+  # ------------------------------------------------------------
+  dashboard:
+    image: x-skynet/dashboard:latest
+    build:
+      context: ..
+      dockerfile: Dockerfile.dashboard
+      target: production
+    container_name: x-skynet-dashboard
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      NODE_ENV: production
+      PORT: "8080"
+      AGENT_API_URL: http://agent:3000
+      REDIS_URL: redis://redis:6379
+      # Dashboard auth
+      DASHBOARD_SECRET: ${DASHBOARD_SECRET:-changeme-in-production}
+    volumes:
+      - dashboard-data:/app/data
+    networks:
+      - x-skynet-net
+    depends_on:
+      - agent
+      - redis
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  # ------------------------------------------------------------
+  # Redis — message queue & cache backend
+  # ------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: x-skynet-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis-data:/data
+    networks:
+      - x-skynet-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+# ============================================================
+# Volumes
+# ============================================================
+volumes:
+  agent-data:
+    driver: local
+  agent-logs:
+    driver: local
+  dashboard-data:
+    driver: local
+  redis-data:
+    driver: local
+
+# ============================================================
+# Networks
+# ============================================================
+networks:
+  x-skynet-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16

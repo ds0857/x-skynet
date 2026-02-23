@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "x-skynet.fullname" . }}-config
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "x-skynet.labels" . | nindent 4 }}
+data:
+  AGENT_NAME: {{ .Values.config.agentName | quote }}
+  MAX_WORKERS: {{ .Values.config.maxWorkers | quote }}
+  TASK_QUEUE_SIZE: {{ .Values.config.taskQueueSize | quote }}
+  HEARTBEAT_INTERVAL: {{ .Values.config.heartbeatInterval | quote }}
+  REDIS_HOST: {{ .Values.redis.host | quote }}
+  REDIS_PORT: {{ .Values.redis.port | quote }}
+  agent.json: |
+    {
+      "name": {{ .Values.config.agentName | quote }},
+      "maxWorkers": {{ .Values.config.maxWorkers }},
+      "taskQueueSize": {{ .Values.config.taskQueueSize }},
+      "heartbeatInterval": {{ .Values.config.heartbeatInterval }},
+      "redis": {
+        "host": {{ .Values.redis.host | quote }},
+        "port": {{ .Values.redis.port }}
+      }
+    }

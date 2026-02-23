@@ -1,0 +1,16 @@
+apiVersion: v2
+name: x-skynet
+description: A cloud-native deployment chart for X-Skynet AI Agent system
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+keywords:
+  - ai
+  - agent
+  - skynet
+home: https://github.com/ds0857/x-skynet
+sources:
+  - https://github.com/ds0857/x-skynet
+maintainers:
+  - name: Nova
+    email: nova@x-skynet.ai

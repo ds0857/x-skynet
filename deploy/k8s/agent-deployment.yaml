@@ -1,0 +1,168 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: x-skynet-agent
+  namespace: x-skynet
+  labels:
+    app.kubernetes.io/name: x-skynet-agent
+    app.kubernetes.io/component: agent
+    app.kubernetes.io/version: "0.1.0"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: x-skynet-agent
+      app.kubernetes.io/component: agent
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: x-skynet-agent
+        app.kubernetes.io/component: agent
+        app.kubernetes.io/version: "0.1.0"
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "3000"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: x-skynet-agent
+      terminationGracePeriodSeconds: 60
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - name: agent
+          image: x-skynet/agent:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          env:
+            - name: NODE_ENV
+              value: production
+            - name: PORT
+              value: "3000"
+            - name: LOG_LEVEL
+              value: info
+            - name: AGENT_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: x-skynet-agent-config
+                  key: AGENT_NAME
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: x-skynet-agent-secrets
+                  key: REDIS_URL
+            - name: ANTHROPIC_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: x-skynet-agent-secrets
+                  key: ANTHROPIC_API_KEY
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: x-skynet-agent-secrets
+                  key: OPENAI_API_KEY
+          # ── Liveness probe ──────────────────────────────────
+          # Restart the container if it becomes unresponsive
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+            successThreshold: 1
+          # ── Readiness probe ─────────────────────────────────
+          # Remove from load balancer until ready to accept traffic
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+            successThreshold: 1
+          # ── Startup probe ───────────────────────────────────
+          # Allow extra time for first startup (e.g. model loading)
+          startupProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 12
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          volumeMounts:
+            - name: config
+              mountPath: /app/config
+              readOnly: true
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: config
+          configMap:
+            name: x-skynet-agent-config
+        - name: tmp
+          emptyDir: {}
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: x-skynet-agent
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: x-skynet-agent
+  namespace: x-skynet
+  labels:
+    app.kubernetes.io/name: x-skynet-agent
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: x-skynet-agent-config
+  namespace: x-skynet
+  labels:
+    app.kubernetes.io/name: x-skynet-agent
+data:
+  AGENT_NAME: x-skynet-agent
+  MAX_WORKERS: "4"
+  TASK_QUEUE_SIZE: "100"
+  HEARTBEAT_INTERVAL: "30"
+  REDIS_HOST: redis
+  REDIS_PORT: "6379"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: x-skynet-agent-secrets
+  namespace: x-skynet
+  labels:
+    app.kubernetes.io/name: x-skynet-agent
+type: Opaque
+stringData:
+  # Replace placeholders with real values before applying
+  ANTHROPIC_API_KEY: "REPLACE_ME"
+  OPENAI_API_KEY: "REPLACE_ME"
+  DASHSCOPE_API_KEY: "REPLACE_ME"
+  REDIS_URL: "redis://redis:6379"

@@ -155,6 +155,35 @@ print(mission.status)  # 'succeeded'
 
 ---
 
+## Deployment
+
+X-Skynet supports multiple deployment methods. See the **[`deploy/` directory](deploy/README.md)** for full documentation.
+
+| Method | Guide |
+|--------|-------|
+| 🐳 **Docker Compose** | [deploy/docker-compose.yml](deploy/docker-compose.yml) — local / single-server |
+| ☸️ **Helm Chart** | [deploy/helm/x-skynet/](deploy/helm/x-skynet/) — Kubernetes via Helm |
+| 📄 **k8s Manifests** | [deploy/k8s/](deploy/k8s/) — raw Kubernetes YAML |
+
+### Quick deploy with Helm
+
+```bash
+helm install x-skynet deploy/helm/x-skynet/ \
+  --namespace x-skynet \
+  --create-namespace \
+  --set secrets.ANTHROPIC_API_KEY=<your-key>
+```
+
+### Quick deploy with Docker Compose
+
+```bash
+docker compose -f deploy/docker-compose.yml up -d
+```
+
+→ **[Full Deployment Guide](deploy/README.md)**
+
+---
+
 ## Contributing
 
 We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.

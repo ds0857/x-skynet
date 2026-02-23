@@ -1,0 +1,55 @@
+🚀 X-Skynet has been deployed successfully!
+
+Release name: {{ .Release.Name }}
+Namespace:    {{ .Release.Namespace }}
+Version:      {{ .Chart.AppVersion }}
+
+==========================================================
+ ACCESS YOUR AGENT
+==========================================================
+
+The agent service is available within the cluster at:
+
+  {{ include "x-skynet.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local:{{ .Values.service.port }}
+
+To access it from your local machine, run:
+
+  kubectl port-forward svc/{{ include "x-skynet.fullname" . }} 3000:{{ .Values.service.port }} -n {{ .Release.Namespace }}
+
+Then open: http://localhost:3000
+
+==========================================================
+ HEALTH CHECK
+==========================================================
+
+  kubectl get pods -n {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "x-skynet.name" . }}"
+
+  # Liveness probe:  GET /health
+  # Readiness probe: GET /ready
+
+==========================================================
+ CONFIGURATION
+==========================================================
+
+To update your deployment:
+
+  helm upgrade {{ .Release.Name }} x-skynet/x-skynet \
+    --set secrets.ANTHROPIC_API_KEY=<your-key> \
+    --set replicaCount=2 \
+    -n {{ .Release.Namespace }}
+
+To uninstall:
+
+  helm uninstall {{ .Release.Name }} -n {{ .Release.Namespace }}
+
+==========================================================
+ IMPORTANT: Set your API keys before using X-Skynet!
+==========================================================
+
+  kubectl create secret generic {{ include "x-skynet.fullname" . }}-secrets \
+    --from-literal=ANTHROPIC_API_KEY=<your-anthropic-key> \
+    --from-literal=OPENAI_API_KEY=<your-openai-key> \
+    --from-literal=REDIS_URL=redis://redis:6379 \
+    -n {{ .Release.Namespace }} --dry-run=client -o yaml | kubectl apply -f -
+
+For full documentation, see: https://github.com/ds0857/x-skynet/tree/main/deploy

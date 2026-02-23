@@ -1,0 +1,100 @@
+# Default values for x-skynet.
+# This is a YAML-formatted file.
+
+replicaCount: 1
+
+image:
+  repository: x-skynet/agent
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext: {}
+
+securityContext: {}
+
+service:
+  type: ClusterIP
+  port: 3000
+  targetPort: 3000
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 6
+  targetCPUUtilizationPercentage: 80
+
+env:
+  NODE_ENV: production
+  LOG_LEVEL: info
+  PORT: "3000"
+
+# Secrets (values will be base64 encoded in secret.yaml)
+secrets:
+  ANTHROPIC_API_KEY: ""
+  OPENAI_API_KEY: ""
+  DASHSCOPE_API_KEY: ""
+  REDIS_URL: "redis://redis:6379"
+
+config:
+  agentName: x-skynet-agent
+  maxWorkers: "4"
+  taskQueueSize: "100"
+  heartbeatInterval: "30"
+
+redis:
+  enabled: true
+  host: redis
+  port: 6379
+
+dashboard:
+  enabled: false
+  replicaCount: 1
+  image:
+    repository: x-skynet/dashboard
+    tag: "latest"
+  service:
+    port: 8080
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 3000
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /ready
+    port: 3000
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
