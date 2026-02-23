@@ -8,7 +8,7 @@
  *
  *   AGENT_ID        — overrides agentId
  *   DASHBOARD_URL   — overrides dashboardUrl
- *   API_KEY         — overrides apiKey
+ *   HEARTBEAT_KEY   — overrides heartbeatKey
  *   HEARTBEAT_MS    — overrides heartbeatIntervalMs (ms)
  */
 
@@ -22,6 +22,8 @@ import { AgentDaemon, AgentDaemonConfig } from '@xskynet/core';
 interface XSkynetJson {
   agentId?: string;
   dashboardUrl?: string;
+  heartbeatKey?: string;
+  /** @deprecated use heartbeatKey */
   apiKey?: string;
   heartbeatIntervalMs?: number;
   plugins?: string[];
@@ -43,12 +45,14 @@ export function registerServeCommand(program: Command): void {
     .option('--config <path>', 'path to .xskynet.json config file', '.xskynet.json')
     .option('--agent-id <id>', 'agent identifier (overrides config / env)')
     .option('--dashboard-url <url>', 'dashboard base URL (overrides config / env)')
-    .option('--api-key <key>', 'heartbeat API key (overrides config / env)')
+    .option('--heartbeat-key <key>', 'heartbeat API key (overrides config / env)')
+    .option('--api-key <key>', 'alias for --heartbeat-key (deprecated)')
     .option('--heartbeat-ms <ms>', 'heartbeat interval in milliseconds')
     .action(async (options: {
       config: string;
       agentId?: string;
       dashboardUrl?: string;
+      heartbeatKey?: string;
       apiKey?: string;
       heartbeatMs?: string;
     }) => {
@@ -79,11 +83,16 @@ export function registerServeCommand(program: Command): void {
         dashboardUrl:
           options.dashboardUrl ??
           process.env['DASHBOARD_URL'] ??
-          fileConfig.dashboardUrl,
-        apiKey:
+          fileConfig.dashboardUrl ??
+          '',
+        heartbeatKey:
+          options.heartbeatKey ??
           options.apiKey ??
+          process.env['HEARTBEAT_KEY'] ??
           process.env['API_KEY'] ??
-          fileConfig.apiKey,
+          fileConfig.heartbeatKey ??
+          fileConfig.apiKey ??
+          '',
         heartbeatIntervalMs:
           options.heartbeatMs != null
             ? parseInt(options.heartbeatMs, 10)
@@ -126,7 +135,7 @@ export function registerServeCommand(program: Command): void {
         if (daemonConfig.dashboardUrl) {
           console.log(chalk.gray('  dashboard:'), daemonConfig.dashboardUrl);
         }
-        console.log(chalk.gray('  heartbeat:'), `every ${daemonConfig.heartbeatIntervalMs ?? 30_000} ms`);
+        console.log(chalk.gray('  heartbeat:'), `every ${daemonConfig.heartbeatIntervalMs ?? 60_000} ms`);
       }
 
       // 4. SIGINT / SIGTERM are handled inside AgentDaemon.start()
