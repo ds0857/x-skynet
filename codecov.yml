@@ -11,9 +11,20 @@ coverage:
         # Keep current overall coverage from regressing too much
         target: auto
         threshold: 2%
+      # Example per-flag project gate scoped to CI flag 'node-20.x'
+      node-20:
+        flags: ["node-20.x"]
+        target: auto
+        threshold: 2%
     patch:
       default:
         # Require reasonable coverage on changed lines in PRs
+        target: 80%
+        threshold: 1%
+        only_pulls: true
+      # Example per-flag patch gate scoped to CI flag 'node-20.x'
+      node-20:
+        flags: ["node-20.x"]
         target: 80%
         threshold: 1%
         only_pulls: true
@@ -23,3 +34,7 @@ coverage:
 flag_management:
   default_rules:
     carryforward: true
+  # Explicit example flag so it shows up in the Flags dashboard
+  individual_flags:
+    - name: "node-20.x"
+      carryforward: true
