@@ -1,0 +1,17 @@
+{
+  "name": "@xskynet/docs",
+  "version": "0.1.0",
+  "description": "X-Skynet documentation site — powered by VitePress",
+  "private": true,
+  "scripts": {
+    "dev": "vitepress dev",
+    "build": "vitepress build",
+    "preview": "vitepress preview"
+  },
+  "devDependencies": {
+    "vitepress": "^1.3.4"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "id": "plan-e2e-001",
+  "title": "Simple E2E Test Plan",
+  "status": "draft",
+  "createdAt": "2026-02-23T00:00:00.000Z",
+  "tasks": [
+    {
+      "id": "task-echo-001",
+      "name": "Echo Hello",
+      "status": "idle",
+      "createdAt": "2026-02-23T00:00:00.000Z",
+      "steps": [
+        {
+          "id": "step-echo-001",
+          "name": "echo Hello X-Skynet",
+          "status": "idle",
+          "createdAt": "2026-02-23T00:00:00.000Z",
+          "tags": ["kind:shell"]
+        }
+      ]
+    }
+  ],
+  "parallel_tasks_plan": {
+    "id": "plan-e2e-parallel-001",
+    "title": "Parallel Tasks E2E Plan",
+    "status": "draft",
+    "createdAt": "2026-02-23T00:00:00.000Z",
+    "tasks": [
+      {
+        "id": "task-parallel-a",
+        "name": "Parallel Task A",
+        "status": "idle",
+        "createdAt": "2026-02-23T00:00:00.000Z",
+        "steps": [
+          {
+            "id": "step-parallel-a-1",
+            "name": "echo task-a",
+            "status": "idle",
+            "createdAt": "2026-02-23T00:00:00.000Z",
+            "tags": ["kind:shell"]
+          }
+        ]
+      },
+      {
+        "id": "task-parallel-b",
+        "name": "Parallel Task B",
+        "status": "idle",
+        "createdAt": "2026-02-23T00:00:00.000Z",
+        "steps": [
+          {
+            "id": "step-parallel-b-1",
+            "name": "echo task-b",
+            "status": "idle",
+            "createdAt": "2026-02-23T00:00:00.000Z",
+            "tags": ["kind:shell"]
+          }
+        ]
+      }
+    ]
+  },
+  "failing_task_plan": {
+    "id": "plan-e2e-fail-001",
+    "title": "Failing Task Plan",
+    "status": "draft",
+    "createdAt": "2026-02-23T00:00:00.000Z",
+    "tasks": [
+      {
+        "id": "task-fail-001",
+        "name": "Failing Task",
+        "status": "idle",
+        "createdAt": "2026-02-23T00:00:00.000Z",
+        "steps": [
+          {
+            "id": "step-fail-001",
+            "name": "exit 1",
+            "status": "idle",
+            "createdAt": "2026-02-23T00:00:00.000Z",
+            "tags": ["kind:shell"]
+          }
+        ]
+      }
+    ]
+  }
+}
