@@ -14,5 +14,15 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test": "node --experimental-vm-modules node_modules/.bin/jest"
-  }
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "package.json"
+  ]
 }

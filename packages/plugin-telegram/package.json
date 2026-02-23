@@ -1,7 +1,7 @@
 {
   "name": "@xskynet/plugin-telegram",
   "version": "0.1.0",
-  "description": "Telegram channel plugin for X-Skynet — receive and send messages via Telegram Bot API",
+  "description": "Telegram channel plugin for X-Skynet \u2014 receive and send messages via Telegram Bot API",
   "license": "Apache-2.0",
   "type": "module",
   "main": "dist/index.js",
@@ -19,5 +19,15 @@
   "peerDependencies": {
     "@xskynet/contracts": "workspace:*",
     "typescript": ">=5.3.0"
-  }
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "package.json"
+  ]
 }

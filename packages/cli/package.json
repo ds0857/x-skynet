@@ -13,7 +13,11 @@
     "dev": "tsx src/index.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
-  "keywords": ["xskynet", "cli", "agents"],
+  "keywords": [
+    "xskynet",
+    "cli",
+    "agents"
+  ],
   "author": "X-Skynet Team",
   "engines": {
     "node": ">=20.0.0"
@@ -32,5 +36,16 @@
     "tsx": "^4.7.0",
     "typescript": "^5.6.3",
     "rimraf": "^5.0.5"
-  }
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "package.json"
+  ],
+  "main": "dist/index.js"
 }

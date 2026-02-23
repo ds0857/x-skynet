@@ -31,3 +31,6 @@ coverage/
 # Test temp dirs
 .xskynet*/
 .xskynet/
+
+# npm local overrides (never commit real tokens)
+.npmrc.local

@@ -17,5 +17,15 @@
   },
   "peerDependencies": {
     "@xskynet/contracts": "workspace:*"
-  }
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "package.json"
+  ]
 }

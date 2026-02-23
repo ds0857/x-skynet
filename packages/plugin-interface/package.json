@@ -1,7 +1,7 @@
 {
   "name": "@x-skynet/plugin-interface",
   "version": "0.1.0",
-  "description": "Standardized plugin interface for X-Skynet — build tools and adapters for the agent framework",
+  "description": "Standardized plugin interface for X-Skynet \u2014 build tools and adapters for the agent framework",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",
@@ -19,5 +19,15 @@
   "devDependencies": {
     "typescript": "^5.3.0",
     "@types/node": "^20.11.0"
-  }
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "package.json"
+  ]
 }
