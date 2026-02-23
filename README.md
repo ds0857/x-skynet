@@ -98,6 +98,7 @@ packages/
 ├── plugin-http      — Generic HTTP call executor
 ├── plugin-shell     — Shell command executor
 ├── plugin-telegram  — Telegram channel transport + executor (Bot API)
+├── plugin-memory    — Persistent agent memory (JSON file backend, set/get/delete/list/search)
 ├── sdk-js           — JavaScript/TypeScript client SDK
 └── sdk-py           — Python client SDK (pip install xskynet)
 ```
