@@ -37,6 +37,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build
+        run: pnpm run build
+
       - name: Typecheck
         run: pnpm run typecheck
         continue-on-error: false
@@ -44,9 +47,6 @@ jobs:
       - name: Lint
         run: pnpm run lint
         continue-on-error: true
-
-      - name: Build
-        run: pnpm run build
 
       - name: Run tests with coverage
         run: pnpm run test:coverage
