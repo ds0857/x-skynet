@@ -5,6 +5,27 @@ import { PluginRegistry } from './registry.js';
  * PluginLoader is responsible for dynamically importing plugin modules,
  * validating them, calling lifecycle hooks, and registering them into
  * a PluginRegistry.
+ *
+ * ## Design Decision — Field Naming: `tools` (not `executors`)
+ *
+ * The canonical field name for a plugin's callable units is **`tools`**, as
+ * defined in the `XSkynetPlugin` interface in `types.ts`.  We deliberately
+ * avoid the alternative name `executors` that appeared in early drafts of
+ * the interface, for the following reasons:
+ *
+ *   1. **Alignment with LLM tooling conventions** — Major AI frameworks
+ *      (OpenAI function-calling, Anthropic tool-use, LangChain tools) all
+ *      use the term "tool".  Using the same name reduces cognitive friction
+ *      for contributors and consumers.
+ *
+ *   2. **Single source of truth** — `XSkynetPlugin.tools` is the only
+ *      field that PluginRegistry iterates over (`findTool`, `allTools`).
+ *      Keeping one name avoids silent bugs where code reading `.executors`
+ *      gets `undefined` from a plugin object that only has `.tools`.
+ *
+ *   3. **Consistency across the codebase** — Both `registry.ts` and this
+ *      file reference `plugin.tools` exclusively.  Any future code that
+ *      references `executors` should be treated as a bug.
  */
 export class PluginLoader {
   private registry: PluginRegistry;
