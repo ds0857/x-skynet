@@ -25,6 +25,8 @@ export default defineConfig({
 
     // ── Top navigation bar ───────────────────────────────────────────────────
     nav: [
+      { text: 'Quick Start', link: '/docs/quickstart' },
+      { text: 'Demo', link: '/docs/demo' },
       { text: 'Guide', link: '/guide/getting-started' },
       { text: 'API Reference', link: '/api/core' },
       { text: 'Changelog', link: 'https://github.com/ds0857/x-skynet/releases' },
@@ -39,6 +41,15 @@ export default defineConfig({
 
     // ── Sidebar ───────────────────────────────────────────────────────────────
     sidebar: {
+      '/docs/': [
+        {
+          text: 'Getting Started',
+          items: [
+            { text: 'Quick Start (5 steps)', link: '/docs/quickstart' },
+            { text: 'Demo Scenarios', link: '/docs/demo' },
+          ],
+        },
+      ],
       '/guide/': [
         {
           text: 'Introduction',
