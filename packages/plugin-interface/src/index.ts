@@ -11,3 +11,5 @@ export type {
 
 export { PluginRegistry } from './registry.js';
 export { PluginLoader } from './loader.js';
+export { Telemetry } from './telemetry.js';
+export type { TelemetryEvent, TelemetryInput } from './telemetry.js';

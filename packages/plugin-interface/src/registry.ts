@@ -1,4 +1,5 @@
 import type { XSkynetPlugin, ToolDefinition } from './types.js';
+import { Telemetry } from './telemetry.js';
 
 /**
  * PluginRegistry manages the lifecycle of loaded plugins and provides
@@ -15,13 +16,18 @@ export class PluginRegistry {
       throw new Error(`Plugin "${plugin.name}" is already registered`);
     }
     this.plugins.set(plugin.name, plugin);
+    Telemetry.track({ type: 'plugin_load', pluginId: plugin.name });
   }
 
   /**
    * Unregister a plugin by name. Returns true if it was found and removed.
    */
   unregister(name: string): boolean {
-    return this.plugins.delete(name);
+    const removed = this.plugins.delete(name);
+    if (removed) {
+      Telemetry.track({ type: 'plugin_unload', pluginId: name });
+    }
+    return removed;
   }
 
   /**
