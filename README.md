@@ -5,6 +5,7 @@
 [![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/ds0857/x-skynet/releases/tag/v0.1.0)
 [![CI](https://github.com/ds0857/x-skynet/actions/workflows/ci.yml/badge.svg)](https://github.com/ds0857/x-skynet/actions/workflows/ci.yml)
 [![Security](https://github.com/ds0857/x-skynet/actions/workflows/security.yml/badge.svg)](https://github.com/ds0857/x-skynet/actions/workflows/security.yml)
+[![Coverage](https://img.shields.io/codecov/c/github/ds0857/x-skynet?logo=codecov&label=coverage)](https://codecov.io/gh/ds0857/x-skynet)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178c6)](https://www.typescriptlang.org/)
 [![pnpm](https://img.shields.io/badge/pnpm-monorepo-orange)](https://pnpm.io/)
