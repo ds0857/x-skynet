@@ -2,14 +2,20 @@
   "name": "@xskynet/core",
   "version": "0.1.0",
   "description": "X-Skynet runtime engine",
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test": "node --experimental-vm-modules node_modules/.bin/jest"
   },
   "peerDependencies": {
-    "@xskynet/contracts": "workspace:*",
-    "@xskynet/plugin-telegram": "workspace:*"
+    "@xskynet/contracts": "workspace:*"
   }
 }

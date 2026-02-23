@@ -1,7 +1,7 @@
 import { DomainEvent, Plan, PlanStatus, RunContext, XSkynetPlugin } from '@xskynet/contracts'
-import { EventBus } from './event-bus'
-import { PluginRegistry } from './plugin-registry'
-import { PlanExecutor } from './executor'
+import { EventBus } from './event-bus.js'
+import { PluginRegistry } from './plugin-registry.js'
+import { PlanExecutor } from './executor.js'
 
 export class XSkynetRuntime {
   private plugins = new PluginRegistry()

@@ -20,16 +20,57 @@ git clone https://github.com/ds0857/x-skynet.git
 cd x-skynet
 pnpm install
 
-# 2. Run the hello-world example
-pnpm --filter @xskynet/example-hello-world start
+# 2. Build the CLI
+pnpm --filter @xskynet/cli build
 
-# 3. Run a research agent
-pnpm --filter @xskynet/example-research-agent start
+# 3. Run the hello-world YAML workflow
+node packages/cli/dist/index.js run examples/hello-world/demo.yaml
 
-# 4. Start a new project from template
-cp -r templates/basic my-agent
-cd my-agent && pnpm install
+# or (after linking the bin globally)
+xskynet run examples/hello-world/demo.yaml
 ```
+
+### YAML Workflow Example
+
+Create a `demo.yaml` workflow file and run it directly:
+
+```bash
+xskynet run hello-world/demo.yaml
+```
+
+A minimal workflow (`examples/hello-world/demo.yaml`):
+
+```yaml
+version: "1.0"
+name: Hello World
+
+tasks:
+  - id: task-greet
+    name: Greet
+    steps:
+      - id: step-echo
+        name: Hello, World!
+        kind: echo
+        metadata:
+          message: "Hello, World from X-Skynet! 🚀"
+
+  - id: task-info
+    name: System Info
+    dependsOn:
+      - task-greet
+    steps:
+      - id: step-date
+        name: Show current date
+        kind: shell
+        command: "echo \"Ran at: $(date)\""
+```
+
+**Supported step kinds:**
+
+| Kind    | Description                                      |
+|---------|--------------------------------------------------|
+| `echo`  | Print a message to stdout (no subprocess)        |
+| `shell` | Execute an arbitrary shell command               |
 
 ---
 

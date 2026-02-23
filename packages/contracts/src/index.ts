@@ -232,6 +232,47 @@ export const err = <E = Error>(error: E): Result<never, E> => ({ ok: false, erro
 
 // End of RFC-0002 contracts
 
+// ────────────────────────────────────────────────────────────────
+// WorkflowDefinition — YAML-friendly schema for xskynet run
+// ────────────────────────────────────────────────────────────────
+
+/** A single step inside a workflow task (YAML schema). */
+export interface WorkflowStep {
+  /** Unique id within the workflow (required). */
+  id: string
+  /** Human-readable label; also used as the shell command for kind=shell. */
+  name: string
+  /** Executor kind — matches a registered StepExecutor.kind (e.g. "shell", "echo"). */
+  kind: string
+  description?: string
+  /** Shell command to execute (used by kind=shell). Falls back to `name` if omitted. */
+  command?: string
+  /** Environment variables forwarded to the command. */
+  env?: Record<string, string>
+  /** Additional metadata passed to the executor. */
+  metadata?: Record<string, unknown>
+}
+
+/** A logical unit grouping one or more steps (YAML schema). */
+export interface WorkflowTask {
+  id: string
+  name: string
+  description?: string
+  steps: WorkflowStep[]
+  /** Task ids this task depends on (determines execution order). */
+  dependsOn?: string[]
+}
+
+/** Top-level YAML structure for a workflow file. */
+export interface WorkflowDefinition {
+  /** Schema version — currently "1.0". */
+  version: '1.0' | string
+  /** Workflow name displayed in CLI output. */
+  name: string
+  description?: string
+  tasks: WorkflowTask[]
+}
+
 // Community plugin interfaces (plugin-first architecture)
 // Minimal domain definitions referenced by plugin contracts
 export interface StepResult {

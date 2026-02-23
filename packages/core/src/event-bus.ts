@@ -1,5 +1,5 @@
 import { DomainEvent, ID, ISODateTime } from '@xskynet/contracts'
-import { EventStore, FileEventStore, InMemoryEventStore, ListOptions, EventFilter } from './event-store'
+import { EventStore, FileEventStore, InMemoryEventStore, ListOptions, EventFilter } from './event-store.js'
 
 function nowIso(): ISODateTime {
   return new Date().toISOString() as ISODateTime

@@ -1,0 +1,33 @@
+version: "1.0"
+name: Hello World
+description: >
+  A minimal X-Skynet workflow that demonstrates the CLI run command.
+  Executes two tasks in sequence: one echo step and one shell step.
+
+tasks:
+  - id: task-greet
+    name: Greet
+    description: Print a friendly greeting
+    steps:
+      - id: step-echo
+        name: Hello, World!
+        kind: echo
+        description: Print a greeting message
+        metadata:
+          message: "Hello, World from X-Skynet! 🚀"
+
+  - id: task-info
+    name: System Info
+    description: Print runtime information
+    dependsOn:
+      - task-greet
+    steps:
+      - id: step-date
+        name: Show date and time
+        kind: shell
+        command: "echo \"Workflow ran at: $(date)\""
+
+      - id: step-node
+        name: Show Node.js version
+        kind: shell
+        command: "node --version"

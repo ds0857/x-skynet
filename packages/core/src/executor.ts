@@ -1,6 +1,6 @@
 import { Artifact, DomainEvent, Plan, PlanStatus, RunContext, Step, StepResult, StepStatus, Task, TaskStatus } from '@xskynet/contracts'
-import { PluginNotFoundError, DependencyCycleError } from './errors'
-import { PluginRegistry } from './plugin-registry'
+import { PluginNotFoundError, DependencyCycleError } from './errors.js'
+import { PluginRegistry } from './plugin-registry.js'
 
 import type { ISODateTime } from '@xskynet/contracts'
 function nowIso(): ISODateTime {
