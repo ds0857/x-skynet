@@ -67,9 +67,10 @@ function makePlanWithStep(step: Partial<Step>): Plan {
 
 // ─── Custom Test Plugin ───────────────────────────────────────────────────────
 
-/** A simple in-memory "echo" executor for testing plugin interface compliance */
+/** A simple in-memory "noop-echo" executor for testing plugin interface compliance.
+ *  NOTE: kind uses 'noop-echo' (not 'echo') to avoid collision with ShellPlugin's EchoExecutor. */
 class EchoExecutor implements StepExecutor {
-  readonly kind = 'echo';
+  readonly kind = 'noop-echo';
   readonly calls: Array<{ step: Step; ctx: RunContext }> = [];
 
   async execute(step: Step, ctx: RunContext): Promise<StepResult> {
@@ -129,7 +130,7 @@ describe('Plugin E2E', () => {
       registry.register(pluginA);
       registry.register(pluginB);
 
-      expect(registry.getExecutor('echo')).toBe(echo);
+      expect(registry.getExecutor('noop-echo')).toBe(echo);
       expect(registry.getExecutor('always-fail')).toBe(fail);
       expect(registry.listPlugins()).toHaveLength(2);
     });
@@ -143,7 +144,7 @@ describe('Plugin E2E', () => {
       registry.register({ name: 'p2', version: '1.0.0', executors: [echo2] });
 
       // Last registered wins
-      expect(registry.getExecutor('echo')).toBe(echo2);
+      expect(registry.getExecutor('noop-echo')).toBe(echo2);
     });
   });
 
@@ -201,7 +202,7 @@ describe('Plugin E2E', () => {
       const runtime = new XSkynetRuntime();
       runtime.use(plugin);
 
-      const plan = makePlanWithStep({ name: 'custom-echo-test', tags: ['kind:echo'] });
+      const plan = makePlanWithStep({ name: 'custom-echo-test', tags: ['kind:noop-echo'] });
       const result = await runtime.execute(plan, { env: 'test' });
 
       expect(result.status).toBe('succeeded');
@@ -241,7 +242,7 @@ describe('Plugin E2E', () => {
             name: 'Echo Task',
             status: 'idle',
             createdAt: nowIso(),
-            steps: [makeStep({ id: makeId('step-e-1'), name: 'echo-via-plugin', tags: ['kind:echo'] })],
+            steps: [makeStep({ id: makeId('step-e-1'), name: 'echo-via-plugin', tags: ['kind:noop-echo'] })],
           },
           {
             id: makeId('task-shell-step'),
