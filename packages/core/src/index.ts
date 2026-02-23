@@ -5,3 +5,6 @@ export * from './event-store.js';
 export * from './plugin-registry.js';
 export * from './errors.js';
 export * from './agent-daemon.js';
+export * from './orchestrator.js';
+export * from './acceptance-gate.js';
+export * from './test-feedback.js';

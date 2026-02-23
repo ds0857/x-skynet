@@ -1,6 +1,11 @@
 import type { IncomingMessage, ServerResponse } from 'http';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import {
+  readAgentState,
+  readRuns,
+  readQueue,
+} from './state-reader.js';
 
 // Static directory — set by index.ts before first request
 let _staticDir = '';
@@ -80,16 +85,31 @@ export function json(res: ServerResponse, data: unknown, status = 200): void {
 
 // ── Route handlers ────────────────────────────────────────────────────────────
 
-export function handleAgents(_req: IncomingMessage, res: ServerResponse): void {
-  json(res, getMockAgents());
+export async function handleAgents(_req: IncomingMessage, res: ServerResponse): Promise<void> {
+  const state = await readAgentState();
+  if (state.agents.length > 0) {
+    json(res, state.agents);
+  } else {
+    json(res, getMockAgents());
+  }
 }
 
-export function handleRuns(_req: IncomingMessage, res: ServerResponse): void {
-  json(res, getMockRuns());
+export async function handleRuns(_req: IncomingMessage, res: ServerResponse): Promise<void> {
+  const runs = await readRuns();
+  if (runs.length > 0) {
+    json(res, runs);
+  } else {
+    json(res, getMockRuns());
+  }
 }
 
-export function handleTasks(_req: IncomingMessage, res: ServerResponse): void {
-  json(res, getMockTasks());
+export async function handleTasks(_req: IncomingMessage, res: ServerResponse): Promise<void> {
+  const queue = await readQueue();
+  if (queue.length > 0) {
+    json(res, queue);
+  } else {
+    json(res, getMockTasks());
+  }
 }
 
 export function handleStatic(_req: IncomingMessage, res: ServerResponse): void {
@@ -126,7 +146,7 @@ export function handleStaticJs(_req: IncomingMessage, res: ServerResponse): void
 
 // ── Main router ───────────────────────────────────────────────────────────────
 
-export function handleRequest(req: IncomingMessage, res: ServerResponse): void {
+export async function handleRequest(req: IncomingMessage, res: ServerResponse): Promise<void> {
   const url = req.url ?? '/';
   const method = req.method ?? 'GET';
 
@@ -144,13 +164,13 @@ export function handleRequest(req: IncomingMessage, res: ServerResponse): void {
       handleStaticJs(req, res);
       break;
     case '/api/agents':
-      handleAgents(req, res);
+      await handleAgents(req, res);
       break;
     case '/api/runs':
-      handleRuns(req, res);
+      await handleRuns(req, res);
       break;
     case '/api/tasks':
-      handleTasks(req, res);
+      await handleTasks(req, res);
       break;
     default:
       json(res, { error: 'Not Found' }, 404);

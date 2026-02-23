@@ -104,14 +104,14 @@ describe('handleAgents', () => {
 
   beforeEach(() => { res = makeMockRes(); });
 
-  it('responds with 200 and JSON content-type', () => {
-    handleAgents(makeMockReq() as IncomingMessage, res as unknown as ServerResponse);
+  it('responds with 200 and JSON content-type', async () => {
+    await handleAgents(makeMockReq() as IncomingMessage, res as unknown as ServerResponse);
     expect(res.statusCode).toBe(200);
     expect(res.headers['Content-Type']).toBe('application/json');
   });
 
-  it('body is a valid JSON array', () => {
-    handleAgents(makeMockReq() as IncomingMessage, res as unknown as ServerResponse);
+  it('body is a valid JSON array', async () => {
+    await handleAgents(makeMockReq() as IncomingMessage, res as unknown as ServerResponse);
     const parsed = JSON.parse(res.body);
     expect(Array.isArray(parsed)).toBe(true);
   });
@@ -122,14 +122,14 @@ describe('handleRuns', () => {
 
   beforeEach(() => { res = makeMockRes(); });
 
-  it('responds with 200 and JSON content-type', () => {
-    handleRuns(makeMockReq() as IncomingMessage, res as unknown as ServerResponse);
+  it('responds with 200 and JSON content-type', async () => {
+    await handleRuns(makeMockReq() as IncomingMessage, res as unknown as ServerResponse);
     expect(res.statusCode).toBe(200);
     expect(res.headers['Content-Type']).toBe('application/json');
   });
 
-  it('body is a valid JSON array with 10 entries', () => {
-    handleRuns(makeMockReq() as IncomingMessage, res as unknown as ServerResponse);
+  it('body is a valid JSON array with 10 entries', async () => {
+    await handleRuns(makeMockReq() as IncomingMessage, res as unknown as ServerResponse);
     const parsed = JSON.parse(res.body);
     expect(Array.isArray(parsed)).toBe(true);
     expect(parsed).toHaveLength(10);
@@ -141,14 +141,14 @@ describe('handleTasks', () => {
 
   beforeEach(() => { res = makeMockRes(); });
 
-  it('responds with 200 and JSON content-type', () => {
-    handleTasks(makeMockReq() as IncomingMessage, res as unknown as ServerResponse);
+  it('responds with 200 and JSON content-type', async () => {
+    await handleTasks(makeMockReq() as IncomingMessage, res as unknown as ServerResponse);
     expect(res.statusCode).toBe(200);
     expect(res.headers['Content-Type']).toBe('application/json');
   });
 
-  it('body is a valid JSON array', () => {
-    handleTasks(makeMockReq() as IncomingMessage, res as unknown as ServerResponse);
+  it('body is a valid JSON array', async () => {
+    await handleTasks(makeMockReq() as IncomingMessage, res as unknown as ServerResponse);
     const parsed = JSON.parse(res.body);
     expect(Array.isArray(parsed)).toBe(true);
   });
@@ -157,10 +157,10 @@ describe('handleTasks', () => {
 // ── Router tests ──────────────────────────────────────────────────────────────
 
 describe('handleRequest router', () => {
-  it('routes GET /api/agents to agents data', () => {
+  it('routes GET /api/agents to agents data', async () => {
     const req = makeMockReq('/api/agents');
     const res = makeMockRes();
-    handleRequest(req as IncomingMessage, res as unknown as ServerResponse);
+    await handleRequest(req as IncomingMessage, res as unknown as ServerResponse);
     expect(res.statusCode).toBe(200);
     const body = JSON.parse(res.body);
     expect(Array.isArray(body)).toBe(true);
@@ -168,42 +168,42 @@ describe('handleRequest router', () => {
     expect(body[0]).toHaveProperty('status');
   });
 
-  it('routes GET /api/runs to runs data', () => {
+  it('routes GET /api/runs to runs data', async () => {
     const req = makeMockReq('/api/runs');
     const res = makeMockRes();
-    handleRequest(req as IncomingMessage, res as unknown as ServerResponse);
+    await handleRequest(req as IncomingMessage, res as unknown as ServerResponse);
     expect(res.statusCode).toBe(200);
     const body = JSON.parse(res.body);
     expect(body).toHaveLength(10);
   });
 
-  it('routes GET /api/tasks to tasks data', () => {
+  it('routes GET /api/tasks to tasks data', async () => {
     const req = makeMockReq('/api/tasks');
     const res = makeMockRes();
-    handleRequest(req as IncomingMessage, res as unknown as ServerResponse);
+    await handleRequest(req as IncomingMessage, res as unknown as ServerResponse);
     expect(res.statusCode).toBe(200);
     const body = JSON.parse(res.body);
     expect(Array.isArray(body)).toBe(true);
   });
 
-  it('returns 404 for unknown routes', () => {
+  it('returns 404 for unknown routes', async () => {
     const req = makeMockReq('/unknown-route');
     const res = makeMockRes();
-    handleRequest(req as IncomingMessage, res as unknown as ServerResponse);
+    await handleRequest(req as IncomingMessage, res as unknown as ServerResponse);
     expect(res.statusCode).toBe(404);
   });
 
-  it('returns 405 for non-GET methods', () => {
+  it('returns 405 for non-GET methods', async () => {
     const req = makeMockReq('/api/agents', 'POST');
     const res = makeMockRes();
-    handleRequest(req as IncomingMessage, res as unknown as ServerResponse);
+    await handleRequest(req as IncomingMessage, res as unknown as ServerResponse);
     expect(res.statusCode).toBe(405);
   });
 
-  it('CORS header is present on API responses', () => {
+  it('CORS header is present on API responses', async () => {
     const req = makeMockReq('/api/agents');
     const res = makeMockRes();
-    handleRequest(req as IncomingMessage, res as unknown as ServerResponse);
+    await handleRequest(req as IncomingMessage, res as unknown as ServerResponse);
     expect(res.headers['Access-Control-Allow-Origin']).toBe('*');
   });
 });
