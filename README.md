@@ -184,6 +184,10 @@ docker compose -f deploy/docker-compose.yml up -d
 
 ---
 
+## Release Process
+
+See the Release Readiness evidence template: [docs/release-readiness.md](docs/release-readiness.md)
+
 ## Contributing
 
 We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.

@@ -1,0 +1,69 @@
+name: "Go / No-Go Meeting"
+description: "Formal go/no-go checkpoint for release"
+labels: ["release", "go-no-go"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Go / No-Go
+        Use this form to record the outcome of the go/no-go review.
+  - type: input
+    id: version
+    attributes:
+      label: Release version
+      placeholder: vX.Y.Z
+    validations:
+      required: true
+  - type: input
+    id: date
+    attributes:
+      label: Meeting date/time
+      placeholder: 2026-02-23 10:00 local
+    validations:
+      required: true
+  - type: textarea
+    id: attendees
+    attributes:
+      label: Attendees
+      placeholder: |
+        - @owner (Release Manager)
+        - @qa
+        - @eng-lead
+        - @ops
+        - @product
+    validations:
+      required: true
+  - type: checkboxes
+    id: criteria
+    attributes:
+      label: Criteria review
+      options:
+        - label: Release Readiness issue approved
+        - label: All critical bugs closed or accepted with mitigation
+        - label: Rollout/rollback plan reviewed
+        - label: Monitoring and on-call ready
+    validations:
+      required: true
+  - type: dropdown
+    id: decision
+    attributes:
+      label: Decision
+      options:
+        - GO
+        - NO-GO
+        - GO WITH CONDITIONS
+    validations:
+      required: true
+  - type: textarea
+    id: conditions
+    attributes:
+      label: Conditions or blockers (if any)
+      placeholder: List actions required before GO, or reasons for NO-GO
+  - type: input
+    id: approver
+    attributes:
+      label: Approver
+      placeholder: @owner
+    validations:
+      required: true
