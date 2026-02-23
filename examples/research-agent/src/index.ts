@@ -1,56 +1,51 @@
-/*
-  Research Agent example simulating a real X-Skynet use case.
-
-  What it does:
-  - Defines a simple research plan with 3 subtasks
-  - Each subtask uses an HTTP fetch tool to gather data
-  - Aggregates the findings into a concise summary
-
-  Note: This demonstrates the intended flow and API; adjust imports to match current SDK.
-*/
-import { Agent } from '@xskynet/sdk-js';
-import { defineTool } from '@xskynet/core';
-
-// A mocked HTTP fetch tool; replace with @xskynet/plugin-http when available
-const httpGet = defineTool({
-  name: 'http.get',
-  description: 'Fetch a URL and return text',
-  async execute(input: { url: string }) {
-    // In real usage, call the plugin's fetch. Here we simulate.
-    const res = await fetch(input.url);
-    const text = await res.text();
-    return { text };
-  }
-});
+/**
+ * Research Agent Example — X-Skynet AI Container
+ * 
+ * Demonstrates a multi-step research workflow:
+ * 1. Search for information (HTTP plugin)
+ * 2. Analyze results (Claude plugin)  
+ * 3. Generate report (Shell plugin)
+ */
+import { XSkynetClient } from '@xskynet/sdk-js'
 
 async function main() {
-  const agent = new Agent({ name: 'research-agent', tools: [httpGet] });
+  console.log('X-Skynet Research Agent Example')
+  console.log('=================================')
+  
+  const client = new XSkynetClient({
+    baseUrl: process.env['XSKYNET_URL'] ?? 'http://localhost:3847',
+    apiKey: process.env['XSKYNET_API_KEY'],
+  })
 
-  const plan = [
-    { id: 't1', topic: 'Project X-Skynet overview', url: 'https://example.com' },
-    { id: 't2', topic: 'Agent frameworks comparison', url: 'https://example.com' },
-    { id: 't3', topic: 'Plugin architecture patterns', url: 'https://example.com' },
-  ];
+  // Create a research plan
+  const plan = await client.createPlan({
+    name: 'Research: AI Container Frameworks 2025',
+    description: 'Research latest AI agent container frameworks and produce a comparison report',
+    tasks: [
+      {
+        name: 'search',
+        steps: [
+          { name: 'web-search', executor: 'http', config: { url: 'https://hn.algolia.com/api/v1/search?query=AI+agent+container&tags=story', method: 'GET' } }
+        ]
+      },
+      {
+        name: 'analyze',
+        steps: [
+          { name: 'claude-analysis', executor: 'claude', config: { prompt: 'Analyze the search results and identify key AI container frameworks' } }
+        ]
+      },
+      {
+        name: 'report',
+        steps: [
+          { name: 'generate-report', executor: 'shell', config: { command: 'echo "Report generated at $(date)"' } }
+        ]
+      }
+    ]
+  }).catch(() => ({ id: 'demo-plan', name: 'Research Plan (demo mode)' }))
 
-  const results: Array<{ id: string; topic: string; snippet: string }> = [];
-
-  for (const step of plan) {
-    const output = await agent.run({
-      goal: `Research: ${step.topic}`,
-      input: { url: step.url },
-      tool: 'http.get'
-    });
-
-    // Truncate the fetched text to a short snippet for demo
-    const text = (output.text ?? '').slice(0, 120).replace(/\s+/g, ' ');
-    results.push({ id: step.id, topic: step.topic, snippet: text });
-  }
-
-  const summary = results.map(r => `- ${r.topic}: ${r.snippet}`).join('\n');
-  console.log('Research Summary:\n' + summary);
+  console.log('Plan created:', (plan as any).name ?? JSON.stringify(plan))
+  console.log('\nTo run with a live X-Skynet instance:')
+  console.log('  XSKYNET_URL=http://localhost:3847 XSKYNET_API_KEY=your-key pnpm start')
 }
 
-main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+main().catch(console.error)

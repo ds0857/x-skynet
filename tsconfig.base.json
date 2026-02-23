@@ -9,12 +9,6 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "baseUrl": ".",
-    "paths": {
-      "@xskynet/contracts": ["packages/contracts/src"],
-      "@xskynet/core": ["packages/core/src"],
-      "@xskynet/cli": ["packages/cli/src"]
-    }
+    "forceConsistentCasingInFileNames": true
   }
 }

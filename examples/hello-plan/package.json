@@ -19,7 +19,8 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@xskynet/core": "^0.1.0",
-    "@xskynet/plugin-http": "^0.1.0"
+    "@xskynet/core": "workspace:*",
+    "@xskynet/plugin-http": "workspace:*",
+    "@xskynet/contracts": "workspace:*"
   }
 }

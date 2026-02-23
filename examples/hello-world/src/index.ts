@@ -1,30 +1,13 @@
-/*
-  Hello World example:
-  - Create an agent
-  - Execute a single step
-  - Print the result
-
-  This example uses the intended API shape. Adjust imports if SDK paths differ.
-*/
-import { Agent } from '@xskynet/sdk-js';
-import { defineTool } from '@xskynet/core';
-
-const echo = defineTool({
-  name: 'echo',
-  description: 'Echo back the input',
-  async execute(input: { text: string }) {
-    return { text: input.text };
-  }
-});
+import { XSkynetClient } from '@xskynet/sdk-js'
 
 async function main() {
-  const agent = new Agent({ name: 'hello-agent', tools: [echo] });
-
-  const result = await agent.run({ goal: 'Say hello', input: { text: 'Hello, world!' } });
-  console.log('Result:', result);
+  console.log('X-Skynet Hello World — AI Container Framework')
+  const client = new XSkynetClient({
+    baseUrl: process.env['XSKYNET_URL'] ?? 'http://localhost:3847',
+    apiKey: process.env['XSKYNET_API_KEY'],
+  })
+  console.log('Client ready:', client.constructor.name)
+  console.log('Set XSKYNET_URL to connect to your X-Skynet instance.')
 }
 
-main().catch((e) => {
-  console.error(e);
-  process.exit(1);
-});
+main().catch(console.error)

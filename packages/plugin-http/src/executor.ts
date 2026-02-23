@@ -12,7 +12,7 @@ export class HttpExecutor implements StepExecutor {
   readonly kind = 'http';
 
   async execute(step: Step, ctx: RunContext): Promise<StepResult> {
-    const config = step.metadata as HttpStepConfig;
+    const config = (step.metadata as unknown) as HttpStepConfig;
 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), config.timeout ?? 30000);

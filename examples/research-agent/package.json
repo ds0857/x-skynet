@@ -11,9 +11,9 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
-    "@xskynet/core": "^0.1.0",
-    "@xskynet/sdk-js": "^0.1.0",
-    "@xskynet/plugin-http": "^0.1.0"
+    "@xskynet/core": "workspace:*",
+    "@xskynet/sdk-js": "workspace:*",
+    "@xskynet/plugin-http": "workspace:*"
   },
   "devDependencies": {
     "ts-node": "^10.9.2",

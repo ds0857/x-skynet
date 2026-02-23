@@ -2,8 +2,9 @@ import { Artifact, DomainEvent, Plan, PlanStatus, RunContext, Step, StepResult, 
 import { PluginNotFoundError, DependencyCycleError } from './errors'
 import { PluginRegistry } from './plugin-registry'
 
-function nowIso(): string {
-  return new Date().toISOString()
+import type { ISODateTime } from '@xskynet/contracts'
+function nowIso(): ISODateTime {
+  return new Date().toISOString() as unknown as ISODateTime
 }
 
 export class PlanExecutor {

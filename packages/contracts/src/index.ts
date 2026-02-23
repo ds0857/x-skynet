@@ -274,6 +274,8 @@ export interface Transport {
 }
 
 export interface XSkynetPlugin {
+  capabilities?: string[]
+  description?: string
   name: string
   version: string
   executors?: StepExecutor[]

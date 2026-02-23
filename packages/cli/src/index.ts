@@ -7,7 +7,7 @@ import { registerDevCommand } from './commands/dev.js';
 import { registerLogsCommand } from './commands/logs.js';
 import { registerAgentsCommand } from './commands/agents.js';
 import { registerStatusCommand } from './commands/status.js';
-import pkg from "../package.json" assert { type: "json" };
+import pkg from "../package.json" with { type: "json" };
 
 const program = new Command();
 

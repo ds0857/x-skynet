@@ -22,7 +22,7 @@ export class ClaudeExecutor implements StepExecutor {
         system: ctx.bag?.systemPrompt as string,
       })
 
-      const outputText = response.content.find((c) => c.type === 'text')?.text ?? ''
+      // const outputText = response.content.find((c) => c.type === 'text')?.text ?? ''
 
       // Create output artifact
       const outputArtifact: Artifact = {
