@@ -12,6 +12,8 @@ Recommended required checks (global + per-package components):
 
 - CI job(s)
   - build-test (Node 20.x) – our main CI job that runs lint, typecheck, tests, and uploads coverage
+- Docs lint
+  - Docs Lint / docs-lint – runs pnpm run lint:docs on docs/.github/tooling changes
 - Codecov checks
   - Global checks
     - codecov/patch – validates coverage on changed lines in the PR
