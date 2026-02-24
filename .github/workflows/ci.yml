@@ -8,6 +8,8 @@ on:
   pull_request:
     branches:
       - main
+      - dev
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -63,7 +65,8 @@ jobs:
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
-        if: github.event_name == 'push'
+        # Run on both push and pull_request so PRs get coverage signal
+        if: ${{ github.event_name == 'push' || github.event_name == 'pull_request' }}
         with:
           files: coverage/lcov.info
           fail_ci_if_error: false
