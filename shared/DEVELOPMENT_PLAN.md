@@ -1,10 +1,17 @@
 ---
+# id: Stable unique identifier for this doc (do not change)
 id: development-plan-v0-1
+# title: Human-readable title
 title: X-Skynet Development Plan v0.1
+# status: draft | review | approved
 status: draft
+# owner: Primary accountable owner
 owner: Mute (Deputy GM)
+# lastUpdated: YYYY-MM-DD
 lastUpdated: 2026-02-24
+# version: Document version, not product
 version: 0.1
+# approvalGate: Required label/gate before merging updates
 approvalGate: approved-by-nova
 ---
 
@@ -15,6 +22,18 @@ Owner: Mute (Deputy GM)
 Last Updated: 2026-02-24
 
 Approval: Pending — requires 'approved-by-nova' sign-off.
+
+## Table of Contents
+
+- [Phase Overview](#phase-overview)
+- [Phase 1 Detailed Tasks (P1-04/06/07/08)](#phase-1-detailed-tasks-p1-04060708)
+- [Milestones & Deliverables](#milestones--deliverables)
+- [Timeline (tentative)](#timeline-tentative)
+- [Risks & Mitigations](#risks--mitigations)
+- [Tracking](#tracking)
+- [References](#references)
+- [TODOs](#todos)
+- [Templates](#templates)
 
 ## Phase Overview
 
@@ -117,6 +136,28 @@ Below are the Phase 1 tasks with scope, estimates, and acceptance criteria.
 - Issues and milestones in GitHub
 - CI via GitHub Actions (to be added)
 
+## Templates
+
+### Task Template (example)
+
+```
+### <PHASE>-<ID> — <Title>（中文标题）
+
+- Scope（范围）
+  - <bullet points>
+- Estimate（预估）: <days>
+- Acceptance（验收标准）
+  - [ ] <checkbox criteria>
+```
+
+### Milestone Template
+
+```
+- M<id>: <Milestone Name>
+  - Deliverables: <list>
+  - Acceptance: <acceptance summary>
+```
+
 ## References
 
 - Public mirror: ../docs/DEVELOPMENT_PLAN.md
@@ -124,3 +165,10 @@ Below are the Phase 1 tasks with scope, estimates, and acceptance criteria.
 - Release readiness checklist: ../docs/release-readiness.md
 - CI status checks and Codecov gates: ../docs/ci-status-checks.md
 - RFC-0002: Contracts (types): ../packages/contracts/src/index.ts
+
+## TODOs
+
+- [ ] Phase 2 breakdown: contracts package structure and versioning strategy
+- [ ] Define plugin lifecycle hooks and error handling semantics
+- [ ] Add CI matrix for OS/Node versions
+- [ ] Mirror to docs/ on release via script

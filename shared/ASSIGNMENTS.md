@@ -1,10 +1,17 @@
 ---
+# id: Stable unique identifier for this doc (do not change)
 id: assignments-v0-1
+# title: Human-readable title
 title: X-Skynet Assignments v0.1
+# status: draft | review | approved
 status: draft
+# owner: Primary accountable owner
 owner: Mute (Deputy GM)
+# lastUpdated: YYYY-MM-DD
 lastUpdated: 2026-02-24
+# version: Document version, not product
 version: 0.1
+# approvalGate: Required label/gate before merging updates
 approvalGate: approved-by-nova
 ---
 
@@ -15,6 +22,17 @@ Owner: Mute (Deputy GM)
 Last Updated: 2026-02-24
 
 Approval: Pending — requires 'approved-by-nova' sign-off.
+
+## Table of Contents
+
+- [Roles](#roles)
+- [Responsibility Matrix (RACI)](#responsibility-matrix-raci)
+- [Phase 1 Task Owners（P1-04/06/07/08）](#phase-1-task-ownersp1-04060708)
+- [Interfaces / Points of Contact](#interfaces--points-of-contact)
+- [SLAs](#slas)
+- [Near-term Task Matrix (Phase 1)](#near-term-task-matrix-phase-1)
+- [References](#references)
+- [TODOs](#todos)
 
 ## Roles
 
@@ -67,6 +85,12 @@ Legend: R=Responsible, A=Accountable, C=Consulted, I=Informed
 - Quickstart + README — Content (R), Deputy GM (A)
 - Basic tests scaffold — QA (R), Engineering (C), Deputy GM (A)
 - CI skeleton — Engineering (R), QA (C), Deputy GM (A)
+
+## TODOs
+
+- [ ] Map Phase 2 owners for contracts/core/CLI/plugins
+- [ ] Add backup approvers for each area
+- [ ] Define escalation rules for CI breakages
 
 ## References
 
