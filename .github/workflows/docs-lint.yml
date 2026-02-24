@@ -1,0 +1,33 @@
+name: Docs Lint
+
+on:
+  pull_request:
+    branches: ["*"]
+    paths:
+      - "docs/**"
+      - ".github/**"
+      - "tools/docs-lint.mjs"
+
+jobs:
+  docs-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install
+        run: pnpm install --frozen-lockfile=false
+
+      - name: Run docs lint (placeholder)
+        run: pnpm run lint:docs

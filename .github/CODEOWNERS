@@ -1,0 +1,12 @@
+# CODEOWNERS
+# Docs require review from docs owners to merge
+# Order matters; the last matching pattern takes precedence
+
+# Global owners as fallback
+*       @ds0857 @dstlly
+
+# Docs owners
+/docs/** @ds0857 @dstlly
+
+# Website/docs tooling
+/packages/viewer/** @ds0857 @dstlly
