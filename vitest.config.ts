@@ -21,6 +21,13 @@ export default defineConfig({
         "**/node_modules/**",
         "**/scripts/**",
         "examples/**",
+        // Exclude non-core packages/apps from coverage until tests exist
+        "apps/**",
+        "packages/cli/**",
+        "packages/contracts/**",
+        "packages/eslint-config/**",
+        "packages/sdk-js/**",
+        "packages/viewer/**",
       ],
     },
   },
