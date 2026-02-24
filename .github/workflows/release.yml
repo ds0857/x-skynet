@@ -8,7 +8,12 @@ on:
     inputs:
       tag:
         description: 'Release tag (e.g. v1.0.0)'
-        required: true
+        required: false
+      dry_run:
+        description: 'Dry run (build/validate only; skip publish and release)'
+        required: false
+        type: boolean
+        default: true
 
 permissions:
   contents: write
@@ -76,25 +81,33 @@ jobs:
 
       - name: Extract tag version
         id: version
-        run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+        run: |
+          if [ -n "${{ github.event.inputs.tag }}" ]; then
+            echo "VERSION=${{ github.event.inputs.tag }}" >> $GITHUB_OUTPUT
+            echo "VERSION_STRIPPED=${{ github.event.inputs.tag#v }}" >> $GITHUB_OUTPUT
+          else
+            echo "VERSION=${GITHUB_REF_NAME}" >> $GITHUB_OUTPUT
+            echo "VERSION_STRIPPED=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+          fi
 
       - name: Publish packages to npm
+        if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run != 'true') }}
         run: |
-          # Publish each public package in dependency order
           pnpm -r --filter '!@xskynet/cli' publish --access public --no-git-checks
           pnpm --filter @xskynet/cli publish --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create GitHub Release
+        if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run != 'true') }}
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
           draft: false
-          prerelease: ${{ contains(github.ref_name, '-alpha') || contains(github.ref_name, '-beta') || contains(github.ref_name, '-rc') }}
-          name: x-skynet ${{ github.ref_name }}
+          prerelease: ${{ contains(steps.version.outputs.VERSION, '-alpha') || contains(steps.version.outputs.VERSION, '-beta') || contains(steps.version.outputs.VERSION, '-rc') }}
+          name: x-skynet ${{ steps.version.outputs.VERSION }}
           body: |
-            ## x-skynet ${{ github.ref_name }}
+            ## x-skynet ${{ steps.version.outputs.VERSION }}
 
             Published packages to npm:
             - `@xskynet/core`
@@ -105,8 +118,3 @@ jobs:
             - `@xskynet/plugin-claude`
             - `@xskynet/plugin-http`
             - `@xskynet/plugin-shell`
-
-            Install:
-            ```bash
-            npm install @xskynet/core@${{ steps.version.outputs.VERSION }}
-            ```
