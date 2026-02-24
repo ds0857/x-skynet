@@ -8,61 +8,70 @@ on:
 
 # Cancel in-progress runs on the same ref
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+# Minimal required permissions
 permissions:
   contents: read
 
 jobs:
   build-test:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write # required for Codecov OIDC
     strategy:
       matrix:
         node-version: [20.x]
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: "pnpm"
+          cache: pnpm
 
-      - name: Enable corepack (pnpm)
-        run: corepack enable
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
 
-      - name: Install pnpm and dependencies
-        run: |
-          npm i -g pnpm@9
-          # Use non-frozen lockfile for now since lockfile may not be committed
-          pnpm install --frozen-lockfile=false
+      - name: Install dependencies (frozen lockfile)
+        run: pnpm install --frozen-lockfile
 
-      - name: Lint
-        run: pnpm lint
+      - name: Build
+        run: pnpm build
 
       - name: Typecheck
         run: pnpm typecheck
 
+      - name: Lint (strict)
+        run: pnpm run lint -- --max-warnings 0
+
       - name: Test (with coverage)
         run: pnpm test
 
-      - name: Upload coverage artifact
+      - name: Upload lcov artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-${{ matrix.node-version }}
-          path: coverage
+          name: coverage-lcov-${{ matrix.node-version }}
+          path: coverage/lcov.info
           if-no-files-found: warn
 
-      - name: Upload coverage to Codecov via OIDC
-        if: always()
-        uses: codecov/codecov-action@v4
-        with:
-          use_oidc: true
-          files: coverage/lcov.info
-          flags: node-${{ matrix.node-version }}
-          fail_ci_if_error: false
+      # Optional: Upload coverage to Codecov using GitHub OIDC
+      # To enable:
+      # 1) Uncomment the step below
+      # 2) Add 'id-token: write' to this job's permissions:
+      #    jobs.build-test.permissions.id-token: write
+      # 3) Ensure Codecov is configured (codecov.yml) or via the Codecov UI
+      #
+      # - name: Upload coverage to Codecov (OIDC)
+      #   if: always()
+      #   uses: codecov/codecov-action@v4
+      #   with:
+      #     use_oidc: true
+      #     files: coverage/lcov.info
+      #     flags: node-${{ matrix.node-version }}
+      #     fail_ci_if_error: false
