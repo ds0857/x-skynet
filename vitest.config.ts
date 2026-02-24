@@ -7,10 +7,12 @@ export default defineConfig({
       provider: "v8",
       reporter: ["text", "lcov"],
       reportsDirectory: "coverage",
-      lines: 80,
-      functions: 80,
-      branches: 75,
-      statements: 80,
+      thresholds: {
+        lines: 80,
+        functions: 80,
+        branches: 75,
+        statements: 80,
+      },
       include: ["src/**/*", "packages/**/*", "apps/**/*"],
       exclude: [
         "**/*.d.ts",
@@ -20,14 +22,6 @@ export default defineConfig({
         "**/scripts/**",
         "examples/**",
       ],
-      thresholds: {
-        global: {
-          lines: 80,
-          functions: 80,
-          branches: 75,
-          statements: 80,
-        },
-      },
     },
   },
 });
