@@ -1,6 +1,6 @@
 # Contributing to X‑Skynet
 
-Thanks for your interest in contributing! This document explains our PR labeling automation and how to work with it.
+Thanks for your interest in contributing! This document explains our PR labeling and CI gates, including how to work with coverage thresholds and our hardened workflow configuration.
 
 ## Pull Request automation
 
@@ -98,3 +98,10 @@ CI notes:
 ### Questions
 
 Open an issue with the `type:docs` label or ask in the discussion forum if you need help with the automation.
+
+### CI hardening quick reference
+
+- Actions pinned by SHA: checkout, setup-node, pnpm/action-setup, upload-artifact, labeler, size-label-action, action-label-syncer.
+- Node cache: cache: pnpm + cache-dependency-path: pnpm-lock.yaml
+- Coverage gates: Vitest thresholds (hard fail) + Codecov project/patch gates (regression guard)
+- Adjust thresholds: edit vitest.config.ts and/or codecov.yml via PR with justification.

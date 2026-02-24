@@ -7,6 +7,27 @@ export default defineConfig({
       provider: "v8",
       reporter: ["text", "lcov"],
       reportsDirectory: "coverage",
+      lines: 80,
+      functions: 80,
+      branches: 75,
+      statements: 80,
+      include: ["src/**/*", "packages/**/*", "apps/**/*"],
+      exclude: [
+        "**/*.d.ts",
+        "**/dist/**",
+        "**/build/**",
+        "**/node_modules/**",
+        "**/scripts/**",
+        "examples/**",
+      ],
+      thresholds: {
+        global: {
+          lines: 80,
+          functions: 80,
+          branches: 75,
+          statements: 80,
+        },
+      },
     },
   },
 });
