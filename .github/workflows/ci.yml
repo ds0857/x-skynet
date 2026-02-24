@@ -61,6 +61,18 @@ jobs:
           path: coverage/lcov.info
           if-no-files-found: warn
 
+      - name: Upload dist artifacts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # actions/upload-artifact@v4.6.2
+        with:
+          name: dist-${{ matrix.node-version }}
+          path: |
+            dist/**
+            packages/**/dist/**
+            apps/**/dist/**
+            examples/**/dist/**
+          if-no-files-found: ignore
+
       # Optional: Upload coverage to Codecov using GitHub OIDC
       # To enable:
       # 1) Uncomment the step below
