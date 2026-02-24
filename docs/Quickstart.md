@@ -7,35 +7,77 @@ This guide gets you to a running demo in ~15 minutes.
 - Node.js 20.11+
 - Corepack enabled (`corepack enable`)
 
+All commands run from the repo root unless noted.
+
 ## 1) Install
 
-```
+```bash
 pnpm i
 ```
 
-## 2) Build core and run demo
+## 2) Run the demo
 
-```
+```bash
 pnpm dev
 ```
 
-This will build `@xskynet/core` and start `apps/demo` using tsx.
+This builds `@xskynet/core` and starts `apps/demo`.
 
-## 3) Lint, typecheck, and test
+Expected output (trimmed):
 
+```text
+Hello, X-Skynet Developer!
 ```
+
+## 3) Preview CLI help (one‑liner)
+
+Until the CLI is fully wired, you can preview the planned help text:
+
+```bash
+node packages/cli/bin/preview-help.js
+```
+
+Expected output (snippet):
+
+```text
+X-Skynet CLI (experimental)
+
+Usage:
+  xskynet <command> [options]
+```
+
+See the full command surface and options in:
+
+- [CLI reference](./cli-reference.md)
+- [CLI: agents design](./cli-agents.md)
+
+## 4) Lint, typecheck, and test
+
+```bash
 pnpm lint
 pnpm typecheck
 pnpm test
 ```
 
-## 4) Explore
+Example success snippets (will vary by environment):
 
-- Contracts live in `packages/contracts`
-- Core library in `packages/core`
-- CLI placeholder in `packages/cli`
+```text
+# typecheck
+Found 0 errors. Watching for file changes.
 
-## Notes
+# test (vitest)
+Test Files  1 passed
+Tests       1 passed
+```
 
-- CI runs lint/typecheck/test on Node 20
-- Changesets configured for versioning (see .changeset/)
+## 5) Explore
+
+- Contracts: `packages/contracts`
+- Core library: `packages/core`
+- CLI (preview): `packages/cli`
+
+Additional docs:
+
+- [CLI reference](./cli-reference.md)
+- [CLI: agents design](./cli-agents.md)
+- [Logging](./logging.md)

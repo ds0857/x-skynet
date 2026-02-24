@@ -14,7 +14,19 @@ Open-source AI agent orchestration framework — 15 minutes to your first runnin
 
 ## Quick Start
 
-See docs/Quickstart.md.
+Prerequisites:
+
+- Node.js 20.11+
+- Corepack enabled (`corepack enable`)
+
+Getting started:
+
+- Install deps: `pnpm i`
+- Run demo: `pnpm dev`
+- Preview CLI help (strings only, no behavior changes yet):
+  - `node packages/cli/bin/preview-help.js`
+
+More details: docs/Quickstart.md. See also: docs/cli-reference.md, docs/cli-agents.md.
 
 ## Monorepo structure
 

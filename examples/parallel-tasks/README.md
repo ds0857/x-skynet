@@ -2,14 +2,45 @@
 
 This example illustrates distributing multiple independent Steps concurrently and then joining their results.
 
-## Flow
+Status: Preview in Phase 2. The runnable example will land incrementally.
 
-1. Fan‑out: create N Steps with specific inputs
-2. Execute in parallel using plugin‑provided StepExecutors
-3. Fan‑in: wait for all to complete and reduce outputs into a single artifact
+## Try it today (repo root)
 
-## Considerations
+Install and sanity check your environment:
 
-- Limit parallelism based on RunContext constraints
-- Retries should be handled inside executors and reported via StepResult.stats.retries
-- Deterministic reduction ensures reproducible results
+```bash
+pnpm i
+pnpm dev
+```
+
+Expected output (trimmed):
+
+```text
+Hello, X-Skynet Developer!
+```
+
+Preview the CLI help (one‑liner):
+
+```bash
+node packages/cli/bin/preview-help.js
+```
+
+Expected output (snippet):
+
+```text
+X-Skynet CLI (experimental)
+
+Usage:
+  xskynet <command> [options]
+```
+
+## Planned command shape (once runnable)
+
+```bash
+xskynet agents run parallel-tasks --input fanout.json --log-level info
+```
+
+## See also
+
+- ../../docs/cli-reference.md
+- ../../docs/cli-agents.md
