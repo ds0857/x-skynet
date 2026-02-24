@@ -38,3 +38,59 @@ flag_management:
   individual_flags:
     - name: "node-20.x"
       carryforward: true
+
+# Define per-package Components so each package has its own coverage status checks
+# See: https://docs.codecov.com/docs/components
+component_management:
+  # Default status rules applied to all components (can be overridden per-component)
+  default_rules:
+    statuses:
+      - type: project
+        target: auto
+        threshold: 2%
+      - type: patch
+        target: 80%
+        threshold: 1%
+        only_pulls: true
+  # Individual package components (monorepo)
+  individual_components:
+    - component_id: pkg-cli
+      name: "pkg:cli"
+      paths:
+        - "packages/cli/**"
+    - component_id: pkg-contracts
+      name: "pkg:contracts"
+      paths:
+        - "packages/contracts/**"
+    - component_id: pkg-core
+      name: "pkg:core"
+      paths:
+        - "packages/core/**"
+    - component_id: pkg-memory
+      name: "pkg:memory"
+      paths:
+        - "packages/memory/**"
+    - component_id: pkg-mission-control
+      name: "pkg:mission-control"
+      paths:
+        - "packages/mission-control/**"
+    - component_id: pkg-plugin-claude
+      name: "pkg:plugin-claude"
+      paths:
+        - "packages/plugin-claude/**"
+    - component_id: pkg-plugin-http
+      name: "pkg:plugin-http"
+      paths:
+        - "packages/plugin-http/**"
+    - component_id: pkg-plugin-shell
+      name: "pkg:plugin-shell"
+      paths:
+        - "packages/plugin-shell/**"
+    - component_id: pkg-sdk-js
+      name: "pkg:sdk-js"
+      paths:
+        - "packages/sdk-js/**"
+    - component_id: pkg-viewer
+      name: "pkg:viewer"
+      paths:
+        - "packages/viewer/**"
