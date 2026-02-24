@@ -1,0 +1,27 @@
+name: "Post-Release Review (Phase 1)"
+description: "Capture learnings and improvements after Phase 1 release"
+labels: ["post-release", "retro", "phase-1"]
+body:
+  - type: markdown
+    attributes:
+      value: "Reflect on what went well, what to improve, and concrete action items."
+  - type: textarea
+    id: wins
+    attributes:
+      label: "What went well"
+      placeholder: "Successes, strengths, green shoots"
+  - type: textarea
+    id: improvements
+    attributes:
+      label: "What to improve"
+      placeholder: "Gaps, process issues, tooling pain points"
+  - type: textarea
+    id: metrics
+    attributes:
+      label: "Metrics"
+      placeholder: "Build times, test flakiness, coverage deltas, issue lead time"
+  - type: textarea
+    id: actions
+    attributes:
+      label: "Actions"
+      placeholder: "Concrete actions with owners and due dates"

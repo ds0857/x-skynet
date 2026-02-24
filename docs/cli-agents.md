@@ -5,11 +5,13 @@ Status: Experimental in Phase 2. This document captures the intended UX and flag
 ## Overview
 
 The `xskynet agents` family of commands is the primary CLI surface for:
+
 - Listing available agents in your app
 - Running an agent with an input and capturing outputs
 - Inspecting runs and tailing logs
 
 Target design goals:
+
 - One-liner to run any agent in your workspace
 - Deterministic runs with reproducible inputs/outputs
 - First-class, structured logs with run/task/step correlation IDs
@@ -42,6 +44,7 @@ Target design goals:
 - `--cwd <path>`: working directory for agent resolution
 
 Environment variables (fallbacks):
+
 - `XSKYNET_LOG_LEVEL`
 - `XSKYNET_LOG_FORMAT`
 - `XSKYNET_LOG_FILE`
@@ -67,11 +70,13 @@ xskynet agents logs <runId> --follow --log-level info
 ```
 
 ## Exit codes
+
 - 0: success
 - 1: runtime error (agent failed)
 - 2: invalid input/flags
 - 3: not found (agent or run)
 
 ## Notes
+
 - The CLI is a thin orchestration layer that uses SDK contracts from `@xskynet/contracts` and engine facilities from `@xskynet/core`.
 - Logging behavior is described in detail in docs/logging.md.

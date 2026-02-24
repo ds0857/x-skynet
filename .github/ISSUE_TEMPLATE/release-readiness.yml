@@ -1,0 +1,69 @@
+name: "Release Readiness (Phase 1)"
+description: "Checklist to verify Phase 1 exit criteria before Go/No-Go"
+labels: ["release", "checklist", "phase-1"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this checklist to verify the repository is ready to exit Phase 1.
+        Attach evidence links in each section where requested.
+  - type: checkboxes
+    id: install-build
+    attributes:
+      label: Install & Build
+      options:
+        - label: "pnpm i completes without error (attach CI log link)"
+        - label: "pnpm -r build succeeds across workspace (attach job link)"
+  - type: checkboxes
+    id: type-safety
+    attributes:
+      label: Type Safety
+      options:
+        - label: "pnpm typecheck passes at root and all packages (0 TS errors)"
+  - type: checkboxes
+    id: lint-format
+    attributes:
+      label: Lint & Format
+      options:
+        - label: "eslint . --ext .ts,.tsx exit code 0 (0 errors; warnings ≤ 10)"
+        - label: "prettier --check exit code 0"
+  - type: checkboxes
+    id: tests-coverage
+    attributes:
+      label: Tests & Coverage
+      options:
+        - label: "pnpm test passes (0 failed tests)"
+        - label: "Coverage ≥ 40% statements (attach Codecov link)"
+  - type: checkboxes
+    id: ci-pipeline
+    attributes:
+      label: CI Pipeline
+      options:
+        - label: "GH Actions workflow runs on PR: install, typecheck, lint, test, coverage upload (attach run link)"
+  - type: checkboxes
+    id: docs
+    attributes:
+      label: Docs
+      options:
+        - label: "README has Quickstart and badges placeholders (attach PR diff)"
+        - label: "docs/Quickstart.md present and updated (attach PR diff)"
+  - type: checkboxes
+    id: repo-hygiene
+    attributes:
+      label: Repo Hygiene
+      options:
+        - label: "pnpm workspace with TS project references configured (show tsconfig refs)"
+        - label: "Commit conventions enforced (commitlint + husky)"
+        - label: "Prettier, ESLint, EditorConfig present"
+  - type: checkboxes
+    id: issue-templates
+    attributes:
+      label: Issue Templates
+      options:
+        - label: ".github/ISSUE_TEMPLATE contains release-readiness.yml, go-no-go.yml, post-release-review.yml"
+  - type: textarea
+    id: decision
+    attributes:
+      label: Go/No-Go Decision
+      description: "Record final decision and rationale"
+      placeholder: "Outcome: Go | No-Go\nRationale: ...\nDate: YYYY-MM-DD\nDRI: Deputy GM (Mute)"

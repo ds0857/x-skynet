@@ -12,10 +12,12 @@
       "import": "./dist/index.js"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "build": "echo 'skip build for empty package'",
+    "typecheck": "echo 'skip typecheck for empty package'"
   },
   "peerDependencies": {
     "typescript": ">=5.3.0"

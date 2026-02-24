@@ -1,0 +1,28 @@
+name: Auto label by PR size
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  size:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Assign size label
+        uses: pascalgn/size-label-action@v0.5.5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          IGNORED: |
+            .*
+            !.gitignore
+            pnpm-lock.yaml
+            package-lock.json
+            yarn.lock
+            docs/**
+        with:
+          sizes: |
+            {"0":"size:XS","11":"size:S","51":"size:M","201":"size:L","501":"size:XL"}

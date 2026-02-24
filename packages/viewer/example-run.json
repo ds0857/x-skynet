@@ -1,0 +1,32 @@
+{
+  "runId": "example-001",
+  "nodes": [
+    {
+      "id": "scout",
+      "name": "Scout",
+      "status": "success",
+      "duration": 45000,
+      "summary": "Collected sources"
+    },
+    {
+      "id": "quill",
+      "name": "Quill",
+      "status": "success",
+      "duration": 120000,
+      "summary": "Drafted report"
+    },
+    {
+      "id": "xalt",
+      "name": "Xalt",
+      "status": "running",
+      "duration": 30000,
+      "summary": "Executing tests"
+    },
+    { "id": "observer", "name": "Observer", "status": "pending" }
+  ],
+  "edges": [
+    { "from": "scout", "to": "quill", "label": "research-data" },
+    { "from": "quill", "to": "xalt", "label": "draft" },
+    { "from": "xalt", "to": "observer", "label": "results" }
+  ]
+}

@@ -41,4 +41,4 @@ See docs/Quickstart.md.
 
 ## Contributing
 
-Please see CONTRIBUTING.md (to be added).
+Please see CONTRIBUTING.md.

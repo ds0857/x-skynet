@@ -1,0 +1,14 @@
+{
+  "name": "@xskynet/tsconfig",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "private": false,
+  "files": [
+    "base.json",
+    "node.json",
+    "react.json"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}

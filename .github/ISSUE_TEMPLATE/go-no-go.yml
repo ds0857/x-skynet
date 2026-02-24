@@ -1,0 +1,43 @@
+name: "Go / No-Go Meeting"
+description: "Conduct the Go/No-Go meeting and capture the decision for Phase 1"
+labels: ["go-no-go", "release", "phase-1"]
+body:
+  - type: markdown
+    attributes:
+      value: "Review Release Readiness checklist and evidence links, then record the decision."
+  - type: checkboxes
+    id: quorum
+    attributes:
+      label: "Attendance / Quorum"
+      options:
+        - label: "Deputy GM (Mute) present"
+        - label: "QA (observer) present"
+        - label: "Engineering (xalt) present"
+        - label: "Content (quill) present"
+  - type: textarea
+    id: risks
+    attributes:
+      label: "Outstanding Risks"
+      placeholder: "List any risks and mitigations"
+  - type: textarea
+    id: blockers
+    attributes:
+      label: "Blockers"
+      placeholder: "List any blockers and owners"
+  - type: dropdown
+    id: decision
+    attributes:
+      label: "Decision"
+      options:
+        - Go
+        - No-Go
+  - type: textarea
+    id: rationale
+    attributes:
+      label: "Rationale"
+      placeholder: "Why this decision? Reference evidence links."
+  - type: textarea
+    id: actions
+    attributes:
+      label: "Follow-up Actions"
+      placeholder: "Actions, owners, due dates"

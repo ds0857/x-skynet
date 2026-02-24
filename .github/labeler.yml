@@ -1,0 +1,81 @@
+# Path-based labeler (actions/labeler@v5)
+# Docs: https://github.com/actions/labeler
+# Labels applied are in the form "scope:*"
+
+scope:contracts:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "packages/contracts/**"
+
+scope:core:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/core/**"
+
+scope:agents:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/agents/**"
+
+scope:skills:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/skills/**"
+
+scope:channels:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "src/channels/**"
+
+scope:apps:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "apps/**"
+
+scope:docs:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "docs/**"
+          - "README.md"
+
+scope:tests:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "tests/**"
+
+scope:examples:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "examples/**"
+
+scope:templates:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "templates/**"
+
+scope:scripts:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "scripts/**"
+
+scope:ci:
+  - changed-files:
+      - any-glob-to-any-file:
+          - ".github/workflows/**"
+
+scope:repo:
+  - changed-files:
+      - any-glob-to-any-file:
+          - ".eslintrc.*"
+          - ".prettierrc.*"
+          - ".husky/**"
+          - ".gitignore"
+          - "pnpm-workspace.yaml"
+          - "pnpm-lock.yaml"
+          - ".node-version"
+          - ".nvmrc"
+          - ".npmrc"
+          - "commitlint.config.cjs"
+          - "tsconfig.base.json"
+          - "vitest.config.ts"
+          - ".changeset/**"
