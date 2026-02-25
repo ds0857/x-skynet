@@ -33,30 +33,58 @@ component_management:
       name: core
       paths:
         - packages/core/**
+      statuses:
+        - type: project
+          target: auto
+          threshold: 1%
     - component_id: cli
       name: cli
       paths:
         - packages/cli/**
+      statuses:
+        - type: project
+          target: auto
+          threshold: 1%
     - component_id: sdk-js
       name: sdk-js
       paths:
         - packages/sdk-js/**
+      statuses:
+        - type: project
+          target: auto
+          threshold: 1%
     - component_id: contracts
       name: contracts
       paths:
         - packages/contracts/**
+      statuses:
+        - type: project
+          target: auto
+          threshold: 1%
     - component_id: router
       name: router
       paths:
         - packages/router/**
+      statuses:
+        - type: project
+          target: auto
+          threshold: 1%
     - component_id: web-ui
       name: web-ui
       paths:
         - packages/web-ui/**
+      statuses:
+        - type: project
+          target: auto
+          threshold: 1%
     - component_id: plugins
       name: plugins
       paths:
         - packages/plugin-*/**
+      statuses:
+        - type: project
+          target: auto
+          threshold: 1%
 
 # Keep GitHub Checks annotation noise low
 github_checks:

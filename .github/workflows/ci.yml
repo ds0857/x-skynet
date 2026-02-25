@@ -61,10 +61,11 @@ jobs:
           path: coverage/
           retention-days: 7
 
-      - name: Upload coverage to Codecov
+      - name: Upload coverage to Codecov (project)
         uses: codecov/codecov-action@v4
         if: always()
         with:
           files: coverage/lcov.info
           fail_ci_if_error: false
           verbose: false
+          flags: project
