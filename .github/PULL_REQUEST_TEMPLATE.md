@@ -1,21 +1,37 @@
-## Description
-<!-- Please describe the changes in this PR -->
+## Summary
+<!-- What and why. Keep it short. -->
 
-## Testing
-<!-- Please describe how this was tested -->
+## Changes
+- [ ] Files/docs updated
+- [ ] Tests added/updated (if applicable)
+- [ ] DX/CI configs updated (if applicable)
 
-## Documentation
-<!-- Please describe any documentation updates -->
-- [ ] Documentation updated
-- [ ] No documentation changes needed
+## Linked Issues
+<!-- e.g. Closes #123 -->
+
+## Type
+- [ ] feat
+- [ ] fix
+- [ ] chore
+- [ ] docs
+- [ ] refactor
+- [ ] perf
+- [ ] test
+
+## Governance Checklist
+- [ ] Acceptance criteria listed in this PR body
+- [ ] Appropriate labels added (type, area)
+- [ ] Documentation updated or explicitly N/A
+- [ ] No secrets or large binaries committed
+- [ ] Changelog section updated if user-facing change
+- [ ] CI passes locally (lint/test/build) or rationale provided
+
+## Test Plan
+<!-- How did you test it? Include steps or screenshots if relevant. -->
 
 ## Breaking Changes
-<!-- Please check if this PR introduces any breaking changes -->
-- [ ] No breaking changes
-- [ ] Breaking changes present (please describe below)
+- [ ] No
+- [ ] Yes (describe impact and migration)
 
-## Checklist
-- [ ] Code follows project style guidelines
-- [ ] Self-review completed
-- [ ] Tests added/updated (if applicable)
-- [ ] No new warnings introduced
+## Risks & Mitigations
+<!-- Known risks and how we mitigate them -->

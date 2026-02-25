@@ -1,3 +1,23 @@
-* @ds0857
-/packages/core/ @ds0857
-/packages/contracts/ @ds0857
+# Code ownership rules for X-Skynet
+# The last matching pattern takes the most precedence
+
+*                     @ds0857
+
+# Core modules
+/packages/core/       @ds0857
+/packages/contracts/  @ds0857
+/packages/cli/        @ds0857
+
+# Examples and templates
+/examples/            @ds0857
+/templates/           @ds0857
+
+# Documentation and site
+/docs/site/           @ds0857
+/shared/              @ds0857
+
+# Deployment and ops
+/deploy/              @ds0857
+
+# GitHub meta
+/.github/             @ds0857
