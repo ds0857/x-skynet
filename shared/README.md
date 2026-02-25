@@ -13,7 +13,10 @@ This directory contains cross-repo documents used by the team: plans, assignment
 
 ## Contents
 
-- DEVELOPMENT_PLAN.md — project phases and milestones
+- WHITEPAPER.md — project vision and principles
+- MEMORY-SYNC-POLICY.md — mandatory memory hygiene policy (Nova)
+
+- DEVELOPMENT_PLAN.md — project phases and milestones (authoritative; public mirror in docs/)
 - ASSIGNMENTS.md — roles, RACI, SLAs
 - STYLE.md — style rules for shared/ docs (frontmatter, IDs)
 

@@ -1,8 +1,8 @@
-# X-Skynet Assignments v0.1 (Public)
+# X-Skynet Assignments v1.0 (Public)
 
 Status: Draft
 Owner: Mute (Deputy GM)
-Last Updated: 2026-02-23
+Last Updated: 2026-02-25
 
 This is the public-facing mirror of the assignments maintained in shared/.
 

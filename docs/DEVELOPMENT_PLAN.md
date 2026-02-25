@@ -1,8 +1,8 @@
-# X-Skynet Development Plan v0.1
+# X-Skynet Development Plan v1.0
 
 Status: Draft
 Owner: Mute (Deputy GM)
-Last Updated: 2026-02-23
+Last Updated: 2026-02-25
 
 This is the public-facing mirror of the living plan in shared/.
 
