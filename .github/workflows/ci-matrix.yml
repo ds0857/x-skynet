@@ -112,7 +112,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build (filtered)
-        run: pnpm --filter "${{ matrix.name }}" run build --if-present
+        run: pnpm --filter "${{ matrix.name }}" run --if-present build
 
       - name: Typecheck (filtered)
         run: pnpm --filter "${{ matrix.name }}" run typecheck --if-present
