@@ -66,5 +66,6 @@ jobs:
         if: github.event_name == 'push'
         with:
           files: coverage/lcov.info
+          token: ${{ secrets.CODECOV_TOKEN }} # placeholder secret
           fail_ci_if_error: false
           verbose: false
