@@ -13,6 +13,13 @@ X-Skynet lets you build multi-agent workflows as **directed acyclic graphs (DAGs
 
 ---
 
+## Quick Links
+
+- Development Plan: [docs/DEVELOPMENT_PLAN.md](docs/DEVELOPMENT_PLAN.md)
+- Assignments: [docs/ASSIGNMENTS.md](docs/ASSIGNMENTS.md)
+- Templates: [docs/templates/](docs/templates/)
+- Deployment: [deploy/README.md](deploy/README.md)
+
 ## Quick Start
 
 ```bash
