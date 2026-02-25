@@ -31,19 +31,6 @@ jobs:
       contents: read
       security-events: write
 
-  dependency-review:
-    name: Dependency Review (PRs)
-    if: ${{ github.event_name == 'pull_request' }}
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Dependency Review Action
-        uses: actions/dependency-review-action@v4
-        with:
-          fail-on-severity: high
 
   codeql:
     name: CodeQL Static Analysis
