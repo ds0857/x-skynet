@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Skip if pnpm is unavailable (e.g., GitHub code suggestions)
+if ! command -v pnpm >/dev/null 2>&1; then
+  echo "pnpm not found; skipping pre-push tests"
+  exit 0
+fi
+
+# Prevent pushing if tests fail in the workspace
+pnpm test -w
