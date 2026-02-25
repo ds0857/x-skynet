@@ -4,6 +4,7 @@
 
 [![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/ds0857/x-skynet/releases/tag/v0.1.0)
 [![CI](https://github.com/ds0857/x-skynet/actions/workflows/ci.yml/badge.svg)](https://github.com/ds0857/x-skynet/actions/workflows/ci.yml)
+[![PR Checks](https://github.com/ds0857/x-skynet/actions/workflows/pr.yml/badge.svg)](https://github.com/ds0857/x-skynet/actions/workflows/pr.yml)
 [![Security](https://github.com/ds0857/x-skynet/actions/workflows/security.yml/badge.svg)](https://github.com/ds0857/x-skynet/actions/workflows/security.yml)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178c6)](https://www.typescriptlang.org/)
@@ -14,6 +15,10 @@ X-Skynet lets you build multi-agent workflows as **directed acyclic graphs (DAGs
 ---
 
 ## Quick Links
+
+- CI: see [docs/ci.md](docs/ci.md)
+- Required checks: [docs/ci-status-checks.md](docs/ci-status-checks.md)
+
 
 - Development Plan: [docs/DEVELOPMENT_PLAN.md](docs/DEVELOPMENT_PLAN.md)
 - Assignments: [docs/ASSIGNMENTS.md](docs/ASSIGNMENTS.md)
