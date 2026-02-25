@@ -1,0 +1,13 @@
+node_modules/
+dist/
+build/
+coverage/
+.pnpm-store/
+.xskynet*/
+website/build/
+docs/.vitepress/cache/
+docs/.vitepress/dist/
+packages/dag-viewer/dist/
+packages/dag-viewer/node_modules/
+website/.docusaurus/
+website/build/
