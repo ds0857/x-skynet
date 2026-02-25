@@ -1,0 +1,21 @@
+coverage:
+  status:
+    project:
+      default:
+        # Require overall project coverage to meet target; allow small fluctuations
+        target: 80%
+        threshold: 1%
+    patch:
+      default:
+        # New/changed lines must be well-covered
+        target: 90%
+        threshold: 0%
+
+# Reduce noise from unrelated deletions
+comment:
+  layout: "reach,diff,flags,files"
+  require_changes: true
+  require_base: false
+  require_head: true
+
+# Monorepo note: we can add flags later per package if desired

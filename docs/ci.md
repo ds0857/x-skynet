@@ -8,10 +8,22 @@ CI checks include:
 - Install: `pnpm install --frozen-lockfile` with caching
 - Build: `pnpm run build`
 - Typecheck: `pnpm run typecheck`
-- Lint: `pnpm run lint` (non-blocking for now; will be enforced later)
-- Tests: `pnpm run test:coverage` with Jest
+- Lint: `pnpm run lint` (enforced; CI fails on lint errors)
+- Tests: `pnpm run test:coverage` with Jest (see coverage thresholds below)
 - Coverage Artifacts: Upload the `coverage/` folder as a build artifact
 - Coverage Upload: Upload `coverage/lcov.info` to Codecov (requires CODECOV_TOKEN secret)
+
+### Coverage thresholds
+
+Jest enforces global coverage thresholds in `jest.config.js`:
+- Lines: 80%
+- Functions: 80%
+- Statements: 80%
+- Branches: 50% (lower due to defensive error-handling paths)
+
+Additionally, Codecov gating is configured in `codecov.yml`:
+- Project: target 80% (1% threshold tolerance)
+- Patch: target 90% (no tolerance)
 
 ## Secrets
 
