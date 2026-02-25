@@ -1,0 +1,39 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":semanticCommits",
+    ":semanticCommitTypeAll(chore)",
+    "group:allNonMajor"
+  ],
+  "timezone": "UTC",
+  "schedule": ["before 6am on Monday"],
+  "dependencyDashboard": true,
+  "rangeStrategy": "pin",
+  "rebaseWhen": "behind-base-branch",
+  "vulnerabilityAlerts": { "enabled": true },
+  "labels": ["dependencies"],
+  "postUpdateOptions": ["pnpmDedupe"],
+  "packageRules": [
+    {
+      "description": "Automerge safe devDependencies and tooling (non-major)",
+      "matchDepTypes": ["devDependencies"],
+      "matchPackagePatterns": ["^@types/", "^eslint", "^prettier", "^vitest", "^ts-?jest", "^typescript"],
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "automerge": true,
+      "automergeType": "branch"
+    },
+    {
+      "description": "Runtime dependencies: only automerge patch",
+      "matchDepTypes": ["dependencies"],
+      "matchUpdateTypes": ["patch"],
+      "automerge": false
+    },
+    {
+      "description": "No automerge for majors anywhere",
+      "matchUpdateTypes": ["major"],
+      "automerge": false
+    }
+  ],
+  "npm": { "enabled": true }
+}

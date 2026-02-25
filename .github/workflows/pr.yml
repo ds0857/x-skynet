@@ -1,10 +1,6 @@
-name: CI
+name: PR Checks
 
 on:
-  push:
-    branches:
-      - main
-      - dev
   pull_request:
     branches:
       - main
@@ -14,14 +10,16 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  ci:
-    name: Build, Lint & Test
+  pr:
+    name: Fast PR checks
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 15
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Install pnpm
         uses: pnpm/action-setup@v3
@@ -37,9 +35,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build
-        run: pnpm run build
-
       - name: Typecheck
         run: pnpm run typecheck
         continue-on-error: false
@@ -48,24 +43,15 @@ jobs:
         run: pnpm run lint
         continue-on-error: false
 
-      - name: Run tests with coverage
+      - name: Run unit tests with coverage
         run: pnpm run test:coverage
         env:
           CI: true
 
-      - name: Upload coverage report
+      - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: coverage-report
+          name: coverage-pr
           path: coverage/
           retention-days: 7
-
-      - name: Upload coverage to Codecov (project)
-        uses: codecov/codecov-action@v4
-        if: always()
-        with:
-          files: coverage/lcov.info
-          fail_ci_if_error: false
-          verbose: false
-          flags: project

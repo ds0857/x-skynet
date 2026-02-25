@@ -1,0 +1,143 @@
+name: CI (affected matrix)
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches:
+      - dev
+      - "ci/**"
+      - "feat/**"
+      - "chore/**"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  detect:
+    name: Detect affected packages
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      base_sha: ${{ steps.base.outputs.base_sha }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine base commit
+        id: base
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "base_sha=${{ github.event.pull_request.base.sha }}" >> "$GITHUB_OUTPUT"
+          else
+            git fetch origin main --depth=1
+            echo "base_sha=$(git rev-parse origin/main)" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Compute changed packages matrix
+        id: set-matrix
+        run: |
+          set -euo pipefail
+          BASE="${{ steps.base.outputs.base_sha }}"
+          HEAD="${{ github.sha }}"
+
+          echo "Comparing $BASE..$HEAD"
+          CHANGED=$(git diff --name-only "$BASE" "$HEAD" | sort -u)
+
+          # Derive changed top-level package dirs under packages/
+          PKG_DIRS=$(echo "$CHANGED" | grep -E '^packages/[^/]+/' | cut -d/ -f1-2 | sort -u || true)
+
+          if [ -z "${PKG_DIRS:-}" ]; then
+            # Fallback to core to ensure at least one job
+            PKG_DIRS="packages/core"
+          fi
+
+          echo "Changed package dirs:" >&2
+          echo "$PKG_DIRS" >&2
+
+          # Build JSON array with { name, dir, flag }
+          ARR="[]"
+          for dir in $PKG_DIRS; do
+            if [ ! -f "$dir/package.json" ]; then
+              echo "Skipping $dir (no package.json)" >&2
+              continue
+            fi
+            name=$(jq -r .name < "$dir/package.json")
+            case "$dir" in
+              packages/core) flag="core" ;;
+              packages/cli) flag="cli" ;;
+              packages/sdk-js) flag="sdk-js" ;;
+              packages/contracts) flag="contracts" ;;
+              packages/router) flag="router" ;;
+              packages/web-ui) flag="web-ui" ;;
+              packages/plugin-*) flag="plugins" ;;
+              *) flag="misc" ;;
+            esac
+            ARR=$(jq -c --arg name "$name" --arg dir "$dir" --arg flag "$flag" '. + [{"name":$name,"dir":$dir,"flag":$flag}]' <<<"$ARR")
+          done
+
+          echo "matrix=$ARR" >> "$GITHUB_OUTPUT"
+          echo "Matrix: $ARR" >&2
+
+  package:
+    name: Build & Test (${{ matrix.name }})
+    needs: detect
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJson(needs.detect.outputs.matrix) }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build (filtered)
+        run: pnpm --filter "${{ matrix.name }}" run --if-present build
+
+      - name: Typecheck (filtered)
+        run: pnpm --filter "${{ matrix.name }}" run typecheck --if-present
+
+      - name: Lint (filtered)
+        run: pnpm --filter "${{ matrix.name }}" run lint --if-present
+
+      - name: Test with coverage (targeted path)
+        env:
+          CI: true
+        run: pnpm exec jest "${{ matrix.dir }}" --coverage --collectCoverageFrom="${{ matrix.dir }}/src/**/*.ts" --runInBand --passWithNoTests
+
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-${{ matrix.flag }}
+          path: coverage/
+          retention-days: 7
+
+      - name: Upload coverage to Codecov (flagged)
+        uses: codecov/codecov-action@v4
+        if: always()
+        with:
+          files: coverage/lcov.info
+          flags: ${{ matrix.flag }}
+          fail_ci_if_error: false
+          verbose: false
