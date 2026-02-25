@@ -1,0 +1,22 @@
+name: Commitlint
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+
+jobs:
+  commitlint:
+    name: Validate commit messages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run commitlint
+        uses: wagoid/commitlint-github-action@v6
+        with:
+          configFile: commitlint.config.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
