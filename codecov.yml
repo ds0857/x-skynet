@@ -18,4 +18,46 @@ comment:
   require_base: false
   require_head: true
 
-# Monorepo note: we can add flags later per package if desired
+# Component-based coverage gates per major package
+component_management:
+  default_rules:
+    statuses:
+      - type: project
+        target: auto
+        threshold: 1%
+      - type: patch
+        target: 90%
+        threshold: 0%
+  individual_components:
+    - component_id: core
+      name: core
+      paths:
+        - packages/core/**
+    - component_id: cli
+      name: cli
+      paths:
+        - packages/cli/**
+    - component_id: sdk-js
+      name: sdk-js
+      paths:
+        - packages/sdk-js/**
+    - component_id: contracts
+      name: contracts
+      paths:
+        - packages/contracts/**
+    - component_id: router
+      name: router
+      paths:
+        - packages/router/**
+    - component_id: web-ui
+      name: web-ui
+      paths:
+        - packages/web-ui/**
+    - component_id: plugins
+      name: plugins
+      paths:
+        - packages/plugin-*/**
+
+# Keep GitHub Checks annotation noise low
+github_checks:
+  annotations: false

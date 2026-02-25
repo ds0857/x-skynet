@@ -11,6 +11,13 @@ Required status checks:
 - Lockfile integrity (from .github/workflows/lockfile-check.yml)
 - codecov/project (from codecov.yml)
 - codecov/patch (from codecov.yml)
+- codecov/project/core (component)
+- codecov/project/cli (component)
+- codecov/project/sdk-js (component)
+- codecov/project/contracts (component)
+- codecov/project/router (component)
+- codecov/project/web-ui (component)
+- codecov/project/plugins (component)
 
 Additional settings recommended:
 - Require branches to be up to date before merging
