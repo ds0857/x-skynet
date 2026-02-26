@@ -1,0 +1,36 @@
+name: Changeset Check
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  require-changeset:
+    name: Require changeset for package changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect changes in packages/**
+        id: changes
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            packages:
+              - 'packages/**'
+
+      - name: Fail if packages changed without changeset
+        if: steps.changes.outputs.packages == 'true'
+        run: |
+          if ls .changeset/*.md >/dev/null 2>&1; then
+            echo "Found changeset files."
+          else
+            echo "::error::No changeset file found (.changeset/*.md) but packages/** changed."
+            echo "Run 'pnpm dlx changeset' (or 'pnpm exec changeset') and commit the new changeset."
+            exit 1
+          fi
