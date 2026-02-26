@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Skip locally if pnpm is unavailable
+if ! command -v pnpm >/dev/null 2>&1; then
+  echo "pnpm not found; skipping local pre-commit gates"
+  exit 0
+fi
+
+# Enforce quality gates on every commit
+pnpm -r --if-present typecheck && pnpm -r --if-present -F '!@xskynet/dag-viewer' lint && pnpm test -w --silent

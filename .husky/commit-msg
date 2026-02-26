@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Skip if pnpm is unavailable
+if ! command -v pnpm >/dev/null 2>&1; then
+  echo "pnpm not found; skipping commit message lint"
+  exit 0
+fi
+
+# Enforce conventional commits
+pnpm exec commitlint --edit "$1"
