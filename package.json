@@ -8,7 +8,8 @@
   "workspaces": [
     "packages/*",
     "examples/*",
-    "templates/*"
+    "templates/*",
+    "apps/*"
   ],
   "scripts": {
     "build": "pnpm -r build",
@@ -21,7 +22,8 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "prepare": "husky"
+    "prepare": "husky",
+    "onboard": "node -e \"console.log('Prereqs: Node>=20, pnpm>=9');\" && pnpm install && pnpm typecheck && pnpm lint && pnpm test"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.0.0",
