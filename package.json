@@ -5,6 +5,9 @@
   "description": "Open-source AI agent orchestration framework — 15 minutes to your first running agent",
   "license": "Apache-2.0",
   "packageManager": "pnpm@9",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "workspaces": [
     "packages/*",
     "examples/*",
