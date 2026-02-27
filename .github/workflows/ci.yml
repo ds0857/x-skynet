@@ -14,10 +14,226 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  ci:
-    name: Build, Lint & Test
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    continue-on-error: true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Get pnpm store directory
+        id: pnpm-store
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_ENV
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies (retry)
+        uses: nick-fields/retry@v3
+        with:
+          max_attempts: 3
+          timeout_minutes: 10
+          command: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm run lint
+        env:
+          CI: true
+
+  typecheck:
+    name: typecheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Get pnpm store directory
+        id: pnpm-store
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_ENV
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies (retry)
+        uses: nick-fields/retry@v3
+        with:
+          max_attempts: 3
+          timeout_minutes: 10
+          command: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm run typecheck
+        env:
+          CI: true
+
+  build:
+    name: build
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Get pnpm store directory
+        id: pnpm-store
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_ENV
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies (retry)
+        uses: nick-fields/retry@v3
+        with:
+          max_attempts: 3
+          timeout_minutes: 10
+          command: pnpm install --frozen-lockfile
+
+      - name: Build packages
+        run: pnpm -r build
+        env:
+          CI: true
+
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        node: [20]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Set up Node.js ${{ matrix.node }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Get pnpm store directory
+        id: pnpm-store
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_ENV
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies (retry)
+        uses: nick-fields/retry@v3
+        with:
+          max_attempts: 3
+          timeout_minutes: 10
+          command: pnpm install --frozen-lockfile
+
+      - name: Run unit tests with coverage
+        run: pnpm run test:coverage
+        env:
+          CI: true
+
+      - name: Upload JUnit test results (unit)
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: junit-unit-${{ runner.os }}-node-${{ matrix.node }}
+          path: junit/
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report-${{ runner.os }}-node-${{ matrix.node }}
+          path: coverage/
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Upload coverage to Codecov (retry)
+        if: github.event_name == 'push'
+        uses: nick-fields/retry@v3
+        with:
+          max_attempts: 3
+          timeout_minutes: 5
+          command: |
+            curl -Os https://uploader.codecov.io/latest/linux/codecov
+            chmod +x codecov
+            ./codecov -f coverage/lcov.info || true
+
+  e2e-hello:
+    name: E2E smoke - hello-world
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: [build, typecheck, test]
 
     steps:
       - name: Checkout repository
@@ -33,38 +249,65 @@ jobs:
         with:
           node-version: '20'
           cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - name: Get pnpm store directory
+        id: pnpm-store
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_ENV
 
-      - name: Build
-        run: pnpm run build
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
-      - name: Typecheck
-        run: pnpm run typecheck
-        continue-on-error: false
+      - name: Install dependencies (retry)
+        uses: nick-fields/retry@v3
+        with:
+          max_attempts: 3
+          timeout_minutes: 10
+          command: pnpm install --frozen-lockfile
 
-      - name: Lint
-        run: pnpm run lint
-        continue-on-error: true
+      - name: Build packages
+        run: pnpm -r build
 
-      - name: Run tests with coverage
-        run: pnpm run test:coverage
+      - name: Run hello-world E2E (retry with backoff)
+        shell: bash
+        run: |
+          set -uo pipefail
+          mkdir -p e2e-logs
+          attempts=0
+          until node packages/cli/dist/index.js run examples/hello-world/demo.yaml | tee e2e-logs/hello-world.log; do
+            exit_code=$?
+            attempts=$((attempts+1))
+            if [ "$attempts" -ge 3 ]; then
+              echo "E2E hello-world failed after $attempts attempts (exit $exit_code)"
+              exit $exit_code
+            fi
+            backoff=$(( attempts * 20 ))
+            echo "E2E failed (exit $exit_code). Retrying in ${backoff}s..."
+            sleep "$backoff"
+          done
         env:
           CI: true
 
-      - name: Upload coverage report
+      - name: Archive logs (tar.gz)
+        if: always()
+        run: |
+          set -euo pipefail
+          tar -czf e2e-hello-logs.tar.gz -C e2e-logs . || echo "No logs to archive"
+
+      - name: Upload E2E logs artifact
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: coverage-report
-          path: coverage/
+          name: e2e-hello-world-logs-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            e2e-logs/
+            e2e-hello-logs.tar.gz
+          if-no-files-found: ignore
           retention-days: 7
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
-        if: github.event_name == 'push'
-        with:
-          files: coverage/lcov.info
-          fail_ci_if_error: false
-          verbose: false
+          compression-level: 6
