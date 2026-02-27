@@ -66,8 +66,9 @@ Our CI (see .github/workflows/ci.yml) validates contributions with:
 - Prettier format check (fail‑fast)
 - Build + TypeScript typecheck
 - ESLint (non‑blocking)
-- Jest tests with coverage (artifact + Codecov on push)
+- Jest tests with coverage (artifact + Codecov on push) and JUnit XML (jest-junit) for CI analysis
 - Node.js version matrix across Ubuntu and Windows (20, 22). Codecov uploads only from ubuntu+node20 on push.
+- macOS sanity job to catch OS-specific issues
 - E2E smoke tests per example (hello‑world, research‑agent) run as separate jobs and upload logs as artifacts
 
 ### Running the E2E smoke locally
@@ -84,6 +85,12 @@ node packages/cli/dist/index.js run examples/research-agent/demo.yaml
 ```
 
 If any command exits non‑zero, the corresponding CI job will fail.
+
+### CI artifacts and troubleshooting
+- Unit tests: JUnit XML saved under `junit/` via `jest-junit`, uploaded as artifact `junit-unit-*`
+- Coverage: HTML + lcov under `coverage/`, uploaded as `coverage-report-*`, and sent to Codecov on ubuntu+node20
+- E2E: Logs (stdout/tee) archived and uploaded; download artifacts from the run summary when investigating failures
+- Caching: We cache pnpm store across runs to speed up installation. If you suspect a cache issue, re-run without cache or modify the cache key.
 
 ## Pull Requests
 - Ensure `pnpm format:check` passes locally before opening a PR

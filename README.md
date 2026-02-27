@@ -162,13 +162,24 @@ CI runs on pushes and pull requests via .github/workflows/ci.yml and includes:
 - Format check (Prettier) — fail-fast
 - Build + typecheck
 - Lint (non-blocking)
-- Unit test coverage (Jest), uploaded as an artifact (coverage-report) and to Codecov on push
+- Unit test coverage (Jest), uploaded as an artifact (coverage-report) and to Codecov on push. JUnit XML (jest-junit) is also uploaded per-matrix.
 - Node.js matrix on Ubuntu + Windows, versions 20 and 22 (Codecov upload on ubuntu+node20 only)
-- E2E smoke tests for multiple examples, each as its own job:
+- macOS sanity job (build + typecheck) to catch OS-specific issues early
+- E2E smoke tests for multiple examples, each as its own job, with logs archived and uploaded as artifacts:
   - hello-world → `node packages/cli/dist/index.js run examples/hello-world/demo.yaml` (logs: `e2e-hello-world-logs`)
   - research-agent → `node packages/cli/dist/index.js run examples/research-agent/demo.yaml` (logs: `e2e-research-agent-logs`)
 
 Artifacts are available per job in the GitHub Actions run.
+
+Cache strategy:
+- pnpm store is cached across runs using actions/cache with key `${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}`. When lockfile changes, the cache key changes automatically.
+- To bust a stale cache manually, re-run the job without cache or tweak the cache key.
+
+Troubleshooting:
+- Retrieve artifacts for debugging:
+  - Unit: `coverage-report-*` (HTML/LCOV) and `junit-unit-*` (JUnit XML)
+  - E2E logs: `e2e-hello-world-logs-*` and `e2e-research-agent-logs-*` (includes tar.gz)
+- macOS sanity job surfaces OS-specific issues (compiler toolchains, path casing, etc.).
 
 ## Deployment
 
