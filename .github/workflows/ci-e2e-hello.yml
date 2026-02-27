@@ -1,0 +1,48 @@
+name: CI E2E Hello
+
+on:
+  push:
+    branches:
+      - chore/ci-e2e-hello
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  hello:
+    name: E2E Hello (${{ matrix.os }}, Node ${{ matrix.node }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        node: [20, 22]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Run hello task (produce JSON)
+        run: |
+          node -e "const fs=require('fs'); const result={ ok:true, status:'succeeded', platform:process.platform, node:process.version, runnerOS:process.env.RUNNER_OS }; fs.writeFileSync('e2e-hello.json', JSON.stringify(result, null, 2));"
+
+      - name: Validate result (exit code 0 AND JSON.ok==true AND JSON.status==\"succeeded\")
+        run: |
+          node -e "const fs=require('fs'); try { const data=JSON.parse(fs.readFileSync('e2e-hello.json','utf8')); const okExit=true; const okField=data && data.ok===true; const okStatus=data && data.status==='succeeded'; if (!(okExit && okField && okStatus)) { console.error('Validation failed:', { okExit, okField, okStatus, data }); process.exit(1) } } catch (e) { console.error('Validation error:', e); process.exit(1) }"
+
+      - name: Upload artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-hello-${{ matrix.os }}-node${{ matrix.node }}
+          path: e2e-hello.json
+          retention-days: 7
