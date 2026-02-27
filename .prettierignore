@@ -1,0 +1,15 @@
+# Build artifacts
+**/dist/
+**/build/
+coverage/
+website/build/
+
+# Dependencies
+**/node_modules/
+
+# Generated files
+**/*.min.*
+**/generated/
+
+# Package manager files
+pnpm-lock.yaml
