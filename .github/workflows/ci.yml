@@ -22,6 +22,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Install pnpm
         uses: pnpm/action-setup@v3
@@ -36,6 +38,46 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      - name: Verify changeset config exists
+        run: test -f .changeset/config.json && echo "Found .changeset/config.json" || (echo "Missing .changeset/config.json" && exit 1)
+
+      - name: Changeset gate (require .changeset for code changes)
+        if: github.event_name == 'pull_request'
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE_BRANCH="${{ github.base_ref }}"
+          echo "Base branch: $BASE_BRANCH"
+          git fetch --no-tags --prune --depth=0 origin "$BASE_BRANCH"
+          MERGE_BASE=$(git merge-base HEAD "origin/$BASE_BRANCH")
+          echo "Merge base: $MERGE_BASE"
+
+          echo "Changed files since merge-base:"
+          CHANGED=$(git diff --name-only "$MERGE_BASE"...HEAD)
+          printf '%s
+' "$CHANGED"
+
+          NEEDS_CHANGESET=false
+          while IFS= read -r f; do
+            [[ -z "$f" ]] && continue
+            if [[ "$f" == packages/* || "$f" == src/* || "$f" == templates/* || "$f" == deploy/* || "$f" == examples/* || "$f" == website/src/* || "$f" == website/plugins/* ]]; then
+              NEEDS_CHANGESET=true
+              break
+            fi
+          done <<< "$CHANGED"
+
+          if [[ "$NEEDS_CHANGESET" == "true" ]]; then
+            if ls .changeset/*.md >/dev/null 2>&1; then
+              echo "Changeset present — gate passed."
+            else
+              echo "ERROR: Code changes detected but no changeset (.changeset/*.md) found." >&2
+              echo "Run 'pnpm changeset' and commit the generated file." >&2
+              exit 1
+            fi
+          else
+            echo "No code changes that require a changeset — gate skipped."
+          fi
 
       - name: Build
         run: pnpm run build

@@ -260,14 +260,13 @@ Use the [Bug Report template](https://github.com/ds0857/x-skynet/issues/new?temp
 
 ---
 
-## Release Process
+## Release & Versioning
 
-X-Skynet follows [Semantic Versioning](https://semver.org/). Releases are automated via CI:
+See the top-level [RELEASE.md](https://github.com/ds0857/x-skynet/blob/main/RELEASE.md) for the full policy. Summary:
 
-1. Maintainer runs `pnpm changeset` to describe the change
-2. Changesets accumulate on `main`
-3. When ready to release, maintainers merge the "Version Packages" PR
-4. CI publishes to npm and creates a GitHub Release
+- We use [Changesets](https://github.com/changesets/changesets) + Semantic Versioning.
+- Any PR that changes code must include a changeset (`pnpm changeset`). Docs/tests/CI-only changes do not.
+- Maintainers batch changesets with `pnpm changeset version` and push a `vX.Y.Z` tag to trigger publish.
 
 ---
 
