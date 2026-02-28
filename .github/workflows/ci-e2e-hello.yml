@@ -1,0 +1,48 @@
+name: CI E2E Hello
+
+on:
+  workflow_dispatch:
+    inputs:
+      name:
+        description: "Name to say hello to"
+        required: false
+        default: "World"
+      force_fail:
+        description: "Force failure (1/0)"
+        required: false
+        default: "0"
+  pull_request:
+    paths:
+      - '.github/workflows/ci-e2e-hello.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: e2e-hello-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  hello:
+    name: Hello (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Say hello
+        run: |
+          echo "Hello, ${{ inputs.name || 'World' }} from ${{ matrix.os }}" | tee hello.txt
+      - name: Force failure (optional)
+        if: inputs.force_fail == '1' && matrix.os == 'windows-latest'
+        run: |
+          echo "Intentionally failing Windows leg" && exit 1
+      - name: Upload hello artifact (always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: hello-${{ matrix.os }}
+          path: hello.txt
+          if-no-files-found: error
