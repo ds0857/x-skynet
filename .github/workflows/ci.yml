@@ -8,6 +8,12 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      force_fail_one_leg:
+        description: "Force failure in Windows job (1/0)"
+        required: false
+        default: "0"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -15,18 +21,28 @@ concurrency:
 
 jobs:
   ci:
-    name: Build, Lint & Test
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-
+    name: Build, Lint & Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    defaults:
+      run:
+        shell: bash
+    env:
+      # Allow forcing a failure on the Windows leg for validation via repo variable or workflow_dispatch
+      FORCE_FAIL_ONE_LEG: ${{ inputs.force_fail_one_leg || vars.FORCE_FAIL_ONE_LEG || '0' }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v3
+        uses: pnpm/action-setup@v4
         with:
           version: 9
+          run_install: false
 
       - name: Set up Node.js 20
         uses: actions/setup-node@v4
@@ -34,37 +50,56 @@ jobs:
           node-version: '20'
           cache: 'pnpm'
 
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Prepare artifacts dir
+        run: mkdir -p artifacts
+
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile 2>&1 | tee artifacts/install-${{ matrix.os }}.log
 
       - name: Build
-        run: pnpm run build
+        run: pnpm run build 2>&1 | tee artifacts/build-${{ matrix.os }}.log
 
       - name: Typecheck
-        run: pnpm run typecheck
+        run: pnpm run typecheck 2>&1 | tee artifacts/typecheck-${{ matrix.os }}.log
         continue-on-error: false
 
       - name: Lint
-        run: pnpm run lint
+        run: pnpm run lint 2>&1 | tee artifacts/lint-${{ matrix.os }}.log
         continue-on-error: true
 
       - name: Run tests with coverage
-        run: pnpm run test:coverage
+        run: pnpm run test:coverage 2>&1 | tee artifacts/test-${{ matrix.os }}.log
         env:
           CI: true
 
-      - name: Upload coverage report
+      - name: Upload coverage report (ubuntu only)
         uses: actions/upload-artifact@v4
-        if: always()
+        if: always() && matrix.os == 'ubuntu-latest'
         with:
           name: coverage-report
           path: coverage/
           retention-days: 7
 
-      - name: Upload coverage to Codecov
+      - name: Upload coverage to Codecov (push on ubuntu only)
         uses: codecov/codecov-action@v4
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' && matrix.os == 'ubuntu-latest'
         with:
           files: coverage/lcov.info
           fail_ci_if_error: false
           verbose: false
+
+      - name: Optional forced failure on Windows
+        if: matrix.os == 'windows-latest' && (env.FORCE_FAIL_ONE_LEG == '1' || contains(github.ref_name, 'failwin'))
+        run: |
+          echo "Forcing failure on Windows leg as requested"
+          exit 1
+
+      - name: Upload logs (always)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-logs-${{ matrix.os }}
+          path: artifacts/*
