@@ -1,0 +1,52 @@
+name: CI Windows - Sanity
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  windows-sanity:
+    name: Windows sanity
+    runs-on: windows-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies (retry)
+        uses: nick-fields/retry@v3
+        with:
+          max_attempts: 3
+          timeout_minutes: 10
+          command: pnpm install --frozen-lockfile
+
+      - name: Sanity build & typecheck (Windows)
+        run: |
+          pnpm -r build
+          pnpm typecheck
+        env:
+          CI: true
+
+      - name: Environment summary
+        run: |
+          node -v
+          pnpm -v
