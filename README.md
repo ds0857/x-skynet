@@ -3,7 +3,7 @@
 > Open-source AI agent orchestration framework — from idea to running agent in 15 minutes.
 
 [![Version](https://img.shields.io/badge/version-0.1.0-blue.svg)](https://github.com/ds0857/x-skynet/releases/tag/v0.1.0)
-[![CI](https://github.com/ds0857/x-skynet/actions/workflows/ci.yml/badge.svg)](https://github.com/ds0857/x-skynet/actions/workflows/ci.yml)
+[![CI](https://github.com/ds0857/x-skynet/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/ds0857/x-skynet/actions/workflows/ci.yml)
 [![Security](https://github.com/ds0857/x-skynet/actions/workflows/security.yml/badge.svg)](https://github.com/ds0857/x-skynet/actions/workflows/security.yml)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178c6)](https://www.typescriptlang.org/)
@@ -155,6 +155,32 @@ print(mission.status)  # 'succeeded'
 
 ---
 
+## CI
+
+CI runs on pushes and pull requests via .github/workflows/ci.yml and includes:
+
+- Format check (Prettier) — fail-fast
+- Build + typecheck
+- Lint (non-blocking)
+- Unit test coverage (Jest), uploaded as an artifact (coverage-report) and to Codecov on push. JUnit XML (jest-junit) is also uploaded per-matrix.
+- Node.js matrix on Ubuntu + Windows, versions 20 and 22 (Codecov upload on ubuntu+node20 only)
+- macOS sanity job (build + typecheck) to catch OS-specific issues early
+- E2E smoke tests for multiple examples, each as its own job, with logs archived and uploaded as artifacts:
+  - hello-world → `node packages/cli/dist/index.js run examples/hello-world/demo.yaml` (logs: `e2e-hello-world-logs`)
+  - research-agent → `node packages/cli/dist/index.js run examples/research-agent/demo.yaml` (logs: `e2e-research-agent-logs`)
+
+Artifacts are available per job in the GitHub Actions run.
+
+Cache strategy:
+- pnpm store is cached across runs using actions/cache with key `${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}`. When lockfile changes, the cache key changes automatically.
+- To bust a stale cache manually, re-run the job without cache or tweak the cache key.
+
+Troubleshooting:
+- Retrieve artifacts for debugging:
+  - Unit: `coverage-report-*` (HTML/LCOV) and `junit-unit-*` (JUnit XML)
+  - E2E logs: `e2e-hello-world-logs-*` and `e2e-research-agent-logs-*` (includes tar.gz)
+- macOS sanity job surfaces OS-specific issues (compiler toolchains, path casing, etc.).
+
 ## Deployment
 
 X-Skynet supports multiple deployment methods. See the **[`deploy/` directory](deploy/README.md)** for full documentation.
@@ -189,7 +215,7 @@ docker compose -f deploy/docker-compose.yml up -d
 We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 - **Issues**: Bug reports and feature requests welcome
-- **PRs**: Please run `pnpm test` and `pnpm build` before submitting
+- **PRs**: Please run `pnpm run scripts:check` locally before submitting
 - **RFCs**: Architecture changes → open a discussion in `docs/rfc/`
 
 ---

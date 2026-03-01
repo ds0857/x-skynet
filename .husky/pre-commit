@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+# Husky v9+ pre-commit hook
+# Run Prettier + ESLint via lint-staged
+
+if ! command -v pnpm >/dev/null 2>&1; then
+  echo "pnpm not found; skipping lint-staged"
+  exit 0
+fi
+
+pnpm exec lint-staged

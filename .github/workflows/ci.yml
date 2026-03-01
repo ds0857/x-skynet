@@ -15,9 +15,83 @@ concurrency:
 
 jobs:
   ci:
-    name: Build, Lint & Test
+    name: Build, Lint & Test (${{ matrix.os }}, Node ${{ matrix.node }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node: ['20', '22']
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Set up Node.js ${{ matrix.node }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Get pnpm store directory
+        id: pnpm-store
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_ENV
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Local validation (scripts:check)
+        run: pnpm run scripts:check
+        env:
+          CI: true
+
+      - name: Upload JUnit test results (unit)
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: junit-unit-${{ runner.os }}-node-${{ matrix.node }}
+          path: junit/
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report-${{ runner.os }}-node-${{ matrix.node }}
+          path: coverage/
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Upload coverage to Codecov (ubuntu+node20 only, push)
+        uses: codecov/codecov-action@v4
+        if: matrix.os == 'ubuntu-latest' && matrix.node == '20' && github.event_name == 'push'
+        with:
+          files: coverage/lcov.info
+          fail_ci_if_error: false
+          verbose: false
+
+  e2e-hello:
+    name: E2E smoke - hello-world
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    needs: ci
 
     steps:
       - name: Checkout repository
@@ -33,38 +107,167 @@ jobs:
         with:
           node-version: '20'
           cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Get pnpm store directory
+        id: pnpm-store
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_ENV
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build
-        run: pnpm run build
+      - name: Build packages
+        run: pnpm -r build
 
-      - name: Typecheck
-        run: pnpm run typecheck
-        continue-on-error: false
-
-      - name: Lint
-        run: pnpm run lint
-        continue-on-error: true
-
-      - name: Run tests with coverage
-        run: pnpm run test:coverage
+      - name: Run hello-world E2E
+        run: |
+          set -euo pipefail
+          mkdir -p e2e-logs
+          node packages/cli/dist/index.js run examples/hello-world/demo.yaml | tee e2e-logs/hello-world.log
         env:
           CI: true
 
-      - name: Upload coverage report
+      - name: Archive logs (tar.gz)
+        if: always()
+        run: |
+          set -euo pipefail
+          tar -czf e2e-hello-logs.tar.gz -C e2e-logs . || echo "No logs to archive"
+
+      - name: Upload E2E logs artifact
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: coverage-report
-          path: coverage/
+          name: e2e-hello-world-logs-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            e2e-logs/
+            e2e-hello-logs.tar.gz
+          if-no-files-found: ignore
           retention-days: 7
+          compression-level: 6
 
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
-        if: github.event_name == 'push'
+  e2e-research:
+    name: E2E smoke - research-agent
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: ci
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
         with:
-          files: coverage/lcov.info
-          fail_ci_if_error: false
-          verbose: false
+          version: 9
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Get pnpm store directory
+        id: pnpm-store
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_ENV
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build packages
+        run: pnpm -r build
+
+      - name: Run research-agent E2E
+        run: |
+          set -euo pipefail
+          mkdir -p e2e-logs
+          node packages/cli/dist/index.js run examples/research-agent/demo.yaml | tee e2e-logs/research-agent.log
+        env:
+          CI: true
+
+      - name: Archive logs (tar.gz)
+        if: always()
+        run: |
+          set -euo pipefail
+          tar -czf e2e-research-logs.tar.gz -C e2e-logs . || echo "No logs to archive"
+
+      - name: Upload E2E logs artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-research-agent-logs-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            e2e-logs/
+            e2e-research-logs.tar.gz
+          if-no-files-found: ignore
+          retention-days: 7
+          compression-level: 6
+
+  macos-sanity:
+    name: macOS sanity
+    runs-on: macos-latest
+    timeout-minutes: 15
+    needs: ci
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Get pnpm store directory
+        id: pnpm-store
+        shell: bash
+        run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_ENV
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Sanity build & typecheck (macOS)
+        run: |
+          pnpm -r build
+          pnpm typecheck
+        env:
+          CI: true
+
+      - name: Environment summary
+        run: |
+          node -v
+          pnpm -v
+          sw_vers || true

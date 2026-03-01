@@ -56,4 +56,8 @@ export default {
   ],
   setupFilesAfterEnv: [],
   verbose: true,
+  reporters: [
+    "default",
+    ["jest-junit", { "outputDirectory": "junit", "outputName": "unit-jest.xml" }]
+  ],
 };
