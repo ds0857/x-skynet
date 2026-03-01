@@ -134,4 +134,4 @@ generation.
 |------------------------------|---------------------------------------------------|
 | `xskynet: command not found` | Run `pnpm build` first; then `npm link` the CLI   |
 | `Module not found`           | Make sure you ran `pnpm install` at the repo root |
-| Build errors                 | Node.js ≥ 18 and pnpm ≥ 8 are required           |
+| Build errors                 | Node.js ≥ 20 and pnpm ≥ 9 are required           |

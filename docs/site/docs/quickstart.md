@@ -4,8 +4,8 @@ Get from zero to a running AI agent in **under 5 minutes**. No API keys required
 
 ## Prerequisites
 
-- **Node.js** ≥ 18 ([download](https://nodejs.org))
-- **pnpm** ≥ 8 (`npm install -g pnpm`)
+- **Node.js** ≥ 20 ([download](https://nodejs.org))
+- **pnpm** ≥ 9 (`npm install -g pnpm`)
 
 ---
 
@@ -124,11 +124,11 @@ cd packages/cli && npm link
 
 ### Build errors
 
-Make sure Node.js ≥ 18 is active:
+Make sure Node.js ≥ 20 is active:
 
 ```bash
-node --version   # should print v18.x or higher
-pnpm --version   # should print 8.x or higher
+node --version   # should print v20.x or higher
+pnpm --version   # should print 9.x or higher
 ```
 
 ### Workflow YAML parse errors
