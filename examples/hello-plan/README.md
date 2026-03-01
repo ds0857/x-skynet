@@ -4,7 +4,7 @@ This is the simplest example of using the X-Skynet agent framework. It demonstra
 
 ## Prerequisites
 
-- Node.js 18+
+- Node.js 20+
 - npm or yarn
 
 ## Installation

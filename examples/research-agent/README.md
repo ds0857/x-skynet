@@ -52,8 +52,8 @@ xskynet run examples/research-agent/demo.yaml
 
 | Tool     | Version  | Check                   |
 |----------|----------|-------------------------|
-| Node.js  | ≥ 18     | `node --version`        |
-| pnpm     | ≥ 8      | `pnpm --version`        |
+| Node.js  | ≥ 20     | `node --version`        |
+| pnpm     | ≥ 9      | `pnpm --version`        |
 
 ## Expected Output
 

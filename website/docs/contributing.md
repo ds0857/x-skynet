@@ -27,14 +27,34 @@ By participating in this project, you agree to abide by our [Code of Conduct](ht
 
 ---
 
+## GitHub-first Workflow
+
+- Plan and track all work in GitHub: Issues for tasks/bugs, Discussions for ideas, and RFCs for breaking changes.
+- Work in branches from `main` using conventional prefixes (feat/, fix/, docs/, refactor/, test/, chore/, perf/, ci/).
+- Open PRs early, link the related Issue (`Fixes #123`), and request review.
+- Do not push directly to `main`. Always merge via PR (squash-merge preferred).
+- CI must be green before merge; address failing checks instead of skipping them.
+
+## Quality Charter (质量宪法)
+
+To maintain a high bar for reliability and usability, every change must be:
+
+- Buildable: `pnpm build` succeeds across the monorepo.
+- Tested: `pnpm test` passes; target ≥ 80% coverage on new/changed code.
+- Linted & formatted: no ESLint or Prettier violations.
+- Documented: relevant docs in `website/docs/` are updated alongside code.
+- Secure: never commit secrets; validate inputs; avoid unsafe eval/exec; keep deps updated (see `osv-scanner.toml`).
+- Reproducible: update lockfiles when dependencies change; avoid nondeterministic steps.
+- Traceable: Conventional Commit messages that explain the why, not only the what.
+
 ## Development Setup
 
 ### Prerequisites
 
 | Tool | Version |
 |---|---|
-| Node.js | ≥ 18.0.0 |
-| pnpm | ≥ 8.0.0 |
+| Node.js | ≥ 20.0.0 |
+| pnpm | ≥ 9.0.0 |
 | Git | ≥ 2.30 |
 
 ### 1. Fork and Clone

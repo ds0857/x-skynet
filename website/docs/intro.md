@@ -53,13 +53,13 @@ The **core** package is the heart of X-Skynet — it defines the agent lifecycle
 
 ### Prerequisites
 
-- Node.js ≥ 18
-- pnpm ≥ 8 (or npm ≥ 9)
+- Node.js ≥ 20
+- pnpm ≥ 9 (or npm ≥ 10)
 
 ### Installation
 
 ```bash
-npm install -g x-skynet
+npm install -g @xskynet/cli
 ```
 
 Or use `pnpm`:
